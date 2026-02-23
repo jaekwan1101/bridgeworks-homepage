@@ -1408,7 +1408,7 @@ input, select, textarea, button {
     <div class="nav-right">
       <!-- 카카오 알림 상태 (관리자용) -->
       <div id="kakaoLoginStatus" class="kakao-login-status"></div>
-      <a class="btn-nav-login" onclick="closeWebsite()" style="cursor:pointer">관리자 로그인</a>
+      <a class="btn-nav-login" href="admin-applications.html" style="cursor:pointer">관리자 로그인</a>
       <!-- 햄버거 버튼 -->
       <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileNav()" aria-label="메뉴 열기">
         <span class="hb-line"></span>
@@ -1452,7 +1452,7 @@ input, select, textarea, button {
         인재와 기업을<br>연결하는 <span class="highlight">브릿지</span>
       </h1>
       <p class="hero-subtitle">
-        수원·화성·용인 지역 인력공급·근로자파견·청소용역 전문<br>
+        인력공급·근로자파견·청소용역 전문<br>
         브릿지웍스 주식회사가 최적의 인력을 연결해드립니다
       </p>
       <div class="hero-buttons">
@@ -1519,7 +1519,7 @@ input, select, textarea, button {
     <div class="section-header">
       <div class="section-badge">OUR CLIENTS</div>
       <h2 class="section-title">주요 거래처</h2>
-      <p class="section-sub">수원·화성·용인 지역 540여 개 기업과 함께합니다</p>
+      <p class="section-sub">전국 전 지역 1000여 개 기업과 함께합니다</p>
     </div>
     <div class="client-tabs">
       <button class="client-tab active" onclick="filterClients('all',this)">전체</button>
@@ -1927,25 +1927,22 @@ input, select, textarea, button {
 
 // 홈페이지 열기/닫기
 function openWebsite() {
-  document.getElementById('websitePage').classList.remove('hidden');
-  document.getElementById('appPage').classList.add('hidden');
+  // 홈페이지는 항상 표시 (appPage 분리됨)
   initKakaoMap();
   startCountUpAll();
 }
 function closeWebsite() {
-  document.getElementById('websitePage').classList.add('hidden');
-  document.getElementById('appPage').classList.remove('hidden');
-  closeMobileNav();
+  // 관리자 페이지로 이동
+  window.location.href = 'admin-applications.html';
 }
 
-// 스크롤 네비게이션 (websitePage 내부 스크롤)
+// 스크롤 네비게이션 (window 기준 스크롤)
 function navScroll(e, id) {
   e && e.preventDefault();
-  const page = document.getElementById('websitePage');
-  const el   = document.getElementById(id);
-  if (!el || !page) return;
-  const offset = el.getBoundingClientRect().top + page.scrollTop - 70;
-  page.scrollTo({ top: offset, behavior: 'smooth' });
+  const el = document.getElementById(id);
+  if (!el) return;
+  const offset = el.getBoundingClientRect().top + window.pageYOffset - 70;
+  window.scrollTo({ top: offset, behavior: 'smooth' });
 }
 
 /* ────────────────────────────────────────────────────
@@ -1975,14 +1972,12 @@ function mobileNavGo(id) {
   setTimeout(() => navScroll(null, id), 300);
 }
 
-// 스크롤 시 네비 투명도 + 활성 링크
+// 스크롤 시 네비 투명도 + 활성 링크 (window 기준)
 (function() {
-  const page = document.getElementById('websitePage');
-  if (!page) return;
-  page.addEventListener('scroll', function() {
+  window.addEventListener('scroll', function() {
     const nav = document.getElementById('websiteNav');
     if (!nav) return;
-    nav.classList.toggle('scrolled', page.scrollTop > 60);
+    nav.classList.toggle('scrolled', window.pageYOffset > 60);
     // 활성 섹션 표시
     const sections = ['home','about','services','clients','jobs','process','location','contact'];
     let current = 'home';
@@ -1991,7 +1986,7 @@ function mobileNavGo(id) {
       if (el && el.getBoundingClientRect().top - 80 <= 0) current = id;
     });
     document.querySelectorAll('.website-nav-links a').forEach(a => {
-      const href = a.getAttribute('href').replace('#','');
+      const href = a.getAttribute('href') ? a.getAttribute('href').replace('#','') : '';
       a.classList.toggle('active', href === current);
     });
   });
@@ -3166,26 +3161,12 @@ const Modal = {
 
 // ============ 로그인 ============
 function doLogin() {
-  const id = document.getElementById('loginId').value;
-  const pw = document.getElementById('loginPw').value;
-  if (!id||!pw) { Toast.show('아이디와 비밀번호를 입력해주세요.','error'); return; }
-  // 간단 인증 (실제 서버 연동 시 교체)
-  if ((id==='admin'&&pw==='1234')||(id==='박재관'&&pw==='bridgeworks')) {
-    document.getElementById('loginPage').classList.add('hidden');
-    document.getElementById('appPage').classList.remove('hidden');
-    App.currentUser = id;
-    document.querySelector('.user-name').textContent = id==='박재관'?'박재관 대표':'관리자';
-    Store.init();
-    Router.go('dashboard');
-    Toast.show(`안녕하세요! ${id==='박재관'?'박재관 대표님':'관리자'}`, 'success');
-  } else {
-    Toast.show('아이디 또는 비밀번호가 올바르지 않습니다.','error');
-  }
+  // 관리자 로그인은 admin-applications.html 에서 처리
+  window.location.href = 'admin-applications.html';
 }
 function doLogout() {
-  if (!confirm('로그아웃 하시겠습니까?')) return;
-  document.getElementById('appPage').classList.add('hidden');
-  document.getElementById('loginPage').classList.remove('hidden');
+  // 홈페이지로 돌아가기
+  window.location.href = 'index.html';
 }
 
 // ============ 초기화 ============
