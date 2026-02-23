@@ -313,6 +313,7 @@ input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--na
     <span class="gas-status local" id="gasStatusBadge">⚙️ 로컬 모드</span>
     <button class="sync-btn" id="syncBtn" onclick="syncFromGAS()">🔄 GAS 동기화</button>
     <span id="liveClock" style="font-size:12px;opacity:.7"></span>
+    <button onclick="adminLogout()" style="background:#e74c3c;color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;margin-left:8px">🚪 로그아웃</button>
   </div>
 </header>
 
@@ -726,7 +727,11 @@ async function syncFromGAS() {
   const btn = document.getElementById('syncBtn');
   btn.textContent = '⏳ 동기화 중...'; btn.classList.add('loading');
   try {
-    const res  = await fetch(url + '?action=list', { signal: AbortSignal.timeout(15000) });
+    const res  = await fetch(url + '?action=list', {
+      signal: AbortSignal.timeout(15000),
+      mode: 'cors',
+      headers: { 'Accept': 'application/json' }
+    });
     const json = await res.json();
     if (json.ok && Array.isArray(json.data)) {
       applications = json.data;
@@ -839,12 +844,26 @@ function updateKakaoStatusUI() {
        <button class="btn btn-gold btn-sm" onclick="kakaoLogin()" style="margin-left:10px">카카오 로그인</button>`;
 }
 
+
+/* ── 관리자 로그아웃 ─────────────────── */
+function adminLogout() {
+  if (!confirm('로그아웃 하시겠습니까?\n로그인 화면으로 이동합니다.')) return;
+  sessionStorage.removeItem('bw_admin_pass');
+  // 카카오 토큰도 함께 정리
+  localStorage.removeItem('bw_kakao_token');
+  localStorage.removeItem('bw_kakao_token_exp');
+  // 로그인 오버레이 다시 표시
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('loginPw').value = '';
+  Toast.show('로그아웃 되었습니다.', 'info');
+}
+
 function kakaoLogin() {
   if (!window.Kakao || !Kakao.isInitialized()) {
     Toast.show('카카오 키를 먼저 저장하고 페이지를 새로고침하세요', 'warn'); return;
   }
   Kakao.Auth.login({
-    scope: 'talk_message',
+    scope: 'profile',
     success(auth) {
       localStorage.setItem('bw_kakao_token',     auth.access_token);
       localStorage.setItem('bw_kakao_token_exp', Date.now() + auth.expires_in * 1000);
