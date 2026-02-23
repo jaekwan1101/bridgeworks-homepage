@@ -1,196 +1,955 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>브릿지웍스 BridgeWorks</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      font-family: 'Noto Sans KR', sans-serif;
-      background-color: #f4f4f4;
-      color: #333;
-    }
-    header {
-      background: linear-gradient(to right, #003366, #005599);
-      color: white;
-      text-align: center;
-      padding: 40px 20px 30px;
-    }
-    header img {
-      max-height: 60px;
-      margin-bottom: 15px;
-    }
-    nav {
-      background: #003366;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      padding: 12px 0;
-    }
-    nav a {
-      color: white;
-      text-decoration: none;
-      margin: 0 20px;
-      font-weight: bold;
-      transition: color 0.3s;
-    }
-    nav a:hover {
-      color: #ffd700;
-    }
-    section {
-      max-width: 1100px;
-      margin: 40px auto;
-      padding: 40px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    }
-    #about {
-      background: #eef7ff;
-    }
-    #services {
-      background: #fff;
-    }
-    #clients {
-      background: #fff7e6;
-    }
-    #contact {
-      background: #e6fff2;
-    }
-    section h2 {
-      font-size: 1.8em;
-      margin-bottom: 20px;
-      color: #003366;
-    }
-    section h2 i {
-      margin-right: 10px;
-    }
-    ul {
-      padding-left: 20px;
-      line-height: 1.8em;
-    }
-    .slide-banner {
-      width: 100%;
-      overflow: hidden;
-      background: #003366;
-      color: white;
-      padding: 10px 0;
-    }
-    .slide-banner div {
-      white-space: nowrap;
-      display: inline-block;
-      animation: scroll-left 15s linear infinite;
-      padding-left: 100%;
-    }
-    @keyframes scroll-left {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
-    }
-    .fixed-buttons {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 999;
-    }
-    .fixed-buttons a {
-      background: #ff5c5c;
-      color: white;
-      text-decoration: none;
-      padding: 10px 15px;
-      border-radius: 30px;
-      font-weight: bold;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      text-align: center;
-    }
-    footer {
-      background: #003366;
-      color: #eee;
-      text-align: center;
-      padding: 25px;
-      margin-top: 60px;
-    }
-    @media (max-width: 768px) {
-      nav a {
-        margin: 10px;
-      }
-      section {
-        padding: 20px;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>브릿지웍스 주식회사 - 통합 인력관리 플랫폼</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <!-- 카카오 SDK (지도 + 카카오톡) -->
+  <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+  <!-- 카카오 맵 JS API -->
+  <script type="text/javascript"
+    src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_MAP_APP_KEY&libraries=services"></script>
+  <link rel="stylesheet" href="../static/css/main.css">
 </head>
 <body>
-  <header>
-    <img src="/mnt/data/A_logo_for_\"브릿지웍스_BridgeWorks\"_is_displayed_on_a_w.png" alt="브릿지웍스 로고" />
-    <h1>브릿지웍스 BridgeWorks</h1>
-    <p>신뢰와 품질로 연결하는 인력 파견·도급 전문 기업</p>
-  </header>
 
-  <nav>
-    <a href="#about">회사소개</a>
-    <a href="#services">주요업무</a>
-    <a href="#clients">수행현장</a>
-    <a href="#contact">문의하기</a>
+<!-- ============ 토스트 컨테이너 ============ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ============ 전역 모달 ============ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal modal-lg" id="globalModal">
+    <div class="modal-header">
+      <span class="modal-title"></span>
+      <button class="modal-close" onclick="Modal.close()">✕</button>
+    </div>
+    <div class="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="Modal.close()">취소</button>
+      <button class="btn btn-gold btn-modal-save">💾 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================
+     로그인 페이지
+     ================================================ -->
+<div id="loginPage" class="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo-text">BRIDGE<span>WORKS</span></div>
+    </div>
+    <div class="login-subtitle">브릿지웍스 주식회사 통합 인력관리 플랫폼</div>
+    <div class="form-group">
+      <label>아이디</label>
+      <input type="text" id="loginId" placeholder="아이디 입력" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>비밀번호</label>
+      <input type="password" id="loginPw" placeholder="비밀번호 입력" autocomplete="current-password">
+    </div>
+    <button class="btn-login" onclick="doLogin()">로그인</button>
+    <div class="login-footer">
+      테스트 계정: admin / 1234 &nbsp;|&nbsp; 박재관 / bridgeworks
+    </div>
+  </div>
+</div>
+
+<!-- ================================================
+     메인 앱 페이지
+     ================================================ -->
+<div id="appPage" class="app-layout hidden">
+
+  <!-- 사이드바 -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">BRIDGE<span>WORKS</span></div>
+      <div class="sidebar-tagline">통합 인력관리 플랫폼 v1.0</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">메인</div>
+      <div class="nav-item" data-page="dashboard" onclick="Router.go('dashboard')">
+        <span class="nav-icon">📊</span> 대시보드
+      </div>
+      <div class="nav-section-title">인력 관리</div>
+      <div class="nav-item" data-page="workers" onclick="Router.go('workers')">
+        <span class="nav-icon">👷</span> 노무자 관리
+      </div>
+      <div class="nav-item" data-page="clients" onclick="Router.go('clients')">
+        <span class="nav-icon">🏢</span> 거래처 관리
+      </div>
+      <div class="nav-item" data-page="jobseek" onclick="Router.go('jobseek')">
+        <span class="nav-icon">📋</span> 구직대장
+      </div>
+      <div class="nav-item" data-page="joboffer" onclick="Router.go('joboffer')">
+        <span class="nav-icon">📋</span> 구인대장
+      </div>
+      <div class="nav-section-title">재무 관리</div>
+      <div class="nav-item" data-page="ledger" onclick="Router.go('ledger')">
+        <span class="nav-icon">💰</span> 금전출납부
+      </div>
+      <div class="nav-item" data-page="salary" onclick="Router.go('salary')">
+        <span class="nav-icon">🧮</span> 급여 계산기
+      </div>
+      <div class="nav-item" data-page="tax" onclick="Router.go('tax')">
+        <span class="nav-icon">🧾</span> 세무 자료
+      </div>
+      <div class="nav-section-title">서류·출력</div>
+      <div class="nav-item" data-page="documents" onclick="Router.go('documents')">
+        <span class="nav-icon">📄</span> 서류 출력
+      </div>
+      <div class="nav-section-title">시스템</div>
+      <div class="nav-item" data-page="settings" onclick="Router.go('settings')">
+        <span class="nav-icon">⚙️</span> 설정
+      </div>
+      <div class="nav-item" data-page="website" onclick="openWebsite()">
+        <span class="nav-icon">🌐</span> 회사 홈페이지
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">박</div>
+        <div>
+          <div class="user-name">박재관 대표</div>
+          <div class="user-role">브릿지웍스 주식회사</div>
+        </div>
+        <button class="btn-logout" onclick="doLogout()" title="로그아웃">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 메인 콘텐츠 -->
+  <div class="main-content">
+    <header class="top-header">
+      <div class="page-title">
+        <span class="title-icon">📊</span>
+        <span id="pageTitle">대시보드</span>
+      </div>
+      <div class="header-actions">
+        <span class="header-date" id="headerDate"></span>
+        <button class="btn btn-gold btn-sm" onclick="Router.go('ledger');setTimeout(()=>Pages.openLedgerModal(),100)">
+          + 출납 입력
+        </button>
+      </div>
+    </header>
+    <div class="page-body" id="pageContent"></div>
+  </div>
+</div>
+
+<!-- ================================================
+     공개 홈페이지
+     ================================================ -->
+<div id="websitePage" class="hidden" style="position:fixed;inset:0;z-index:300;overflow-y:auto;background:#fff">
+
+  <!-- ── 모바일 메뉴 오버레이 ── -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
+
+  <!-- ── 네비게이션 ── -->
+  <nav class="website-nav" id="websiteNav">
+    <div class="website-logo">BRIDGE<span>WORKS</span></div>
+
+    <!-- 데스크탑 링크 -->
+    <div class="website-nav-links" id="navLinks">
+      <a href="#about"   onclick="navScroll(event,'about')">회사소개</a>
+      <a href="#services" onclick="navScroll(event,'services')">서비스</a>
+      <a href="#clients"  onclick="navScroll(event,'clients')">거래처</a>
+      <a href="#jobs"     onclick="navScroll(event,'jobs')">채용공고</a>
+      <a href="#process"  onclick="navScroll(event,'process')">이용안내</a>
+      <a href="#location" onclick="navScroll(event,'location')">오시는길</a>
+      <a href="#contact"  onclick="navScroll(event,'contact')">문의</a>
+    </div>
+
+    <div class="nav-right">
+      <!-- 카카오 알림 상태 (관리자용) -->
+      <div id="kakaoLoginStatus" class="kakao-login-status"></div>
+      <a class="btn-nav-login" onclick="closeWebsite()" style="cursor:pointer">관리자 로그인</a>
+      <!-- 햄버거 버튼 -->
+      <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileNav()" aria-label="메뉴 열기">
+        <span class="hb-line"></span>
+        <span class="hb-line"></span>
+        <span class="hb-line"></span>
+      </button>
+    </div>
   </nav>
 
-  <section id="about">
-    <h2><i class="fas fa-building"></i>회사소개</h2>
-    <p>브릿지웍스 주식회사는 수원 및 성남을 기반으로 건설현장, 지식산업센터, 병원, 물류센터 등 다양한 분야에 인력을 파견하는 전문 기업입니다. 대표는 전국고용서비스협회 수원시지부장과 중앙회 이사를 겸직하며, 전문성과 네트워크를 바탕으로 광역 인력 운영 시스템을 갖추고 있습니다.</p>
-  </section>
-
-  <section id="services">
-    <h2><i class="fas fa-tools"></i>주요업무</h2>
-    <ul>
-      <li>건설현장 및 아파트 조합 인력 도급</li>
-      <li>지식산업센터 및 물류센터 파견</li>
-      <li>병원 간병, 요양보호사 인력 지원</li>
-      <li>빌딩 및 시설관리</li>
-      <li>청소, 미화, 보안 전문 인력</li>
-    </ul>
-  </section>
-
-  <section id="clients">
-    <h2><i class="fas fa-project-diagram"></i>주요 수행 현장</h2>
-    <ul>
-      <li>의왕 현대산업개발 스마트시티</li>
-      <li>수원·성남·의왕 지식산업센터</li>
-      <li>수원·용인 병원 및 요양병원 협력</li>
-    </ul>
-  </section>
-
-  <section id="contact">
-    <h2><i class="fas fa-envelope"></i>문의하기</h2>
-    <p>대표: 박재관</p>
-    <p>직책: 전국고용서비스협회 수원시지부장, 전국고용서비스협회 중앙회 이사</p>
-    <p>운영기관: 브릿지웍스 주식회사</p>
-    <p>주소: 경기도 수원시 권선구 정조로 458, 301호</p>
-    <p>연락처: 031-225-2466 / 010-9252-4886</p>
-    <p>이메일: alwaysv1@gmail.com</p>
-  </section>
-
-  <section id="map" style="padding: 0; text-align: center;">
-    <img src="/mnt/data/A_logo_for_\"브릿지웍스_BridgeWorks\"_is_displayed_on_a_w.png" alt="BridgeWorks 로고" style="max-height: 60px; margin: 20px auto; display: block;">
-<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3163.398968363455!2d126.9916270764339!3d37.261597972107115!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357b44e9752f4a61%3A0x6df3b7fa845e4dc5!2z6rK96riw64-EIOyEnOqzteybkA!5e0!3m2!1sko!2skr!4v1718700000000!5m2!1sko!2skr" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-  </section>
-
-  <div class="slide-banner">
-    <div>브릿지웍스는 아파트, 지식산업센터, 병원, 물류센터 등 다양한 현장에 전문 인력을 파견합니다. 믿고 맡길 수 있는 파트너! 브릿지웍스와 함께하세요!</div>
+  <!-- 모바일 드로어 메뉴 -->
+  <div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <div class="mnd-header">
+      <div class="mnd-logo">BRIDGE<span>WORKS</span></div>
+      <button class="mnd-close" onclick="closeMobileNav()">✕</button>
+    </div>
+    <nav class="mnd-nav">
+      <a class="mnd-link" href="#about"    onclick="mobileNavGo('about')">🏢 회사소개</a>
+      <a class="mnd-link" href="#services" onclick="mobileNavGo('services')">🤝 서비스</a>
+      <a class="mnd-link" href="#clients"  onclick="mobileNavGo('clients')">🏭 주요거래처</a>
+      <a class="mnd-link" href="#jobs"     onclick="mobileNavGo('jobs')">📋 채용공고</a>
+      <a class="mnd-link" href="#process"  onclick="mobileNavGo('process')">📌 이용안내</a>
+      <a class="mnd-link" href="#location" onclick="mobileNavGo('location')">📍 오시는길</a>
+      <a class="mnd-link" href="#contact"  onclick="mobileNavGo('contact')">📞 문의/신청</a>
+    </nav>
+    <div class="mnd-footer">
+      <a class="btn btn-gold" href="#contact" onclick="mobileNavGo('contact')" style="width:100%;justify-content:center">
+        📝 구인/구직 신청하기
+      </a>
+      <div style="margin-top:12px;font-size:12px;color:var(--gray-500);text-align:center">
+        경기도 수원시 권선구 정조로 458, 301호
+      </div>
+    </div>
   </div>
 
-  <div class="fixed-buttons">
-    <a href="tel:01092524886">📞 전화문의</a>
-    <a href="mailto:alwaysv1@gmail.com">✉️ 이메일문의</a>
+  <!-- ── 히어로 ── -->
+  <section class="hero-section" id="home">
+    <div class="hero-bg-pattern"></div>
+    <div class="hero-content">
+      <div class="hero-badge">🏅 고용노동부 공식 허가 근로자파견사업자 | 허가번호 2025-23</div>
+      <h1 class="hero-title">
+        인재와 기업을<br>연결하는 <span class="highlight">브릿지</span>
+      </h1>
+      <p class="hero-subtitle">
+        수원·화성·용인 지역 인력공급·근로자파견·청소용역 전문<br>
+        브릿지웍스 주식회사가 최적의 인력을 연결해드립니다
+      </p>
+      <div class="hero-buttons">
+        <a class="btn-hero-primary" href="#contact" onclick="navScroll(event,'contact')">구인 신청하기</a>
+        <a class="btn-hero-secondary" href="#services" onclick="navScroll(event,'services')">서비스 알아보기</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="h-value" data-count="3742">0</div><div class="h-label">등록 인력</div></div>
+        <div class="hero-stat"><div class="h-value" data-count="540">0</div><div class="h-label">거래 업체</div></div>
+        <div class="hero-stat"><div class="h-value">5년+</div><div class="h-label">운영 경력</div></div>
+        <div class="hero-stat"><div class="h-value">24H</div><div class="h-label">긴급 대응</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 파견 허가 인증 배너 ── -->
+  <div class="license-section" id="about">
+    <div class="section-header" style="margin-bottom:28px">
+      <div class="section-badge" style="background:rgba(201,168,76,0.15);color:var(--gold)">CERTIFIED</div>
+      <h2 class="section-title" style="color:white">공식 인증 파견사업자</h2>
+    </div>
+    <div class="license-badge">
+      <span class="l-icon">🏛️</span>
+      <div class="license-info">
+        <div class="l-title">고용노동부 | 근로자파견사업 허가</div>
+        <div class="l-desc">허가번호: 2025-23 &nbsp;|&nbsp; 허가기간: 2025.1.8 ~ 2028.1.7 &nbsp;|&nbsp; 발급기관: 중부지방고용노동청 경기지청</div>
+      </div>
+    </div>
   </div>
 
-  <footer>
-    <p>&copy; 2025 브릿지웍스 BridgeWorks. All rights reserved.</p>
+  <!-- ── 서비스 ── -->
+  <section class="services-section" id="services">
+    <div class="section-header">
+      <div class="section-badge">OUR SERVICES</div>
+      <h2 class="section-title">전문 서비스</h2>
+      <p class="section-sub">다양한 분야의 인력 솔루션을 제공합니다</p>
+    </div>
+    <div class="service-grid" style="max-width:1000px;margin:0 auto">
+      <div class="service-card">
+        <div class="service-icon">🤝</div>
+        <div class="service-name">근로자 파견</div>
+        <div class="service-desc">고용노동부 허가를 받은 합법적인 근로자파견 서비스. 생산직·서비스직·청소 등 다양한 직종 파견</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">👥</div>
+        <div class="service-name">인력공급·고용알선</div>
+        <div class="service-desc">구인업체와 구직자를 연결하는 전문 직업소개 서비스. 수도권 전 지역 커버</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🧹</div>
+        <div class="service-name">청소용역</div>
+        <div class="service-desc">건물·아파트·공장·사무실 등 전문 청소용역 서비스. 정기·일시 청소 모두 가능</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📊</div>
+        <div class="service-name">경영 컨설팅</div>
+        <div class="service-desc">인사노무 관련 경영 컨설팅. 4대보험, 노무관리, 근로계약 전반에 걸친 전문 조언</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 고객사 로고 배너 ── -->
+  <section id="clients" class="clients-section">
+    <div class="section-header">
+      <div class="section-badge">OUR CLIENTS</div>
+      <h2 class="section-title">주요 거래처</h2>
+      <p class="section-sub">수원·화성·용인 지역 540여 개 기업과 함께합니다</p>
+    </div>
+    <div class="client-tabs">
+      <button class="client-tab active" onclick="filterClients('all',this)">전체</button>
+      <button class="client-tab" onclick="filterClients('건설',this)">🏗️ 건설·건축</button>
+      <button class="client-tab" onclick="filterClients('제조',this)">🏭 제조·생산</button>
+      <button class="client-tab" onclick="filterClients('물류',this)">🚛 물류·운송</button>
+      <button class="client-tab" onclick="filterClients('청소',this)">🧹 청소·위생</button>
+      <button class="client-tab" onclick="filterClients('서비스',this)">🏢 서비스</button>
+    </div>
+    <div class="marquee-wrapper">
+      <div class="marquee-track" id="marqueeTrack">
+        <div class="logo-card" data-cat="건설"><div class="lc-icon">🏗️</div><div class="lc-name">수원건설(주)</div><div class="lc-type">건설·건축</div></div>
+        <div class="logo-card" data-cat="제조"><div class="lc-icon">🏭</div><div class="lc-name">(주)한국제조</div><div class="lc-type">제조·생산</div></div>
+        <div class="logo-card" data-cat="물류"><div class="lc-icon">🚛</div><div class="lc-name">경기물류센터</div><div class="lc-type">물류·운송</div></div>
+        <div class="logo-card" data-cat="청소"><div class="lc-icon">🧹</div><div class="lc-name">클린서비스(주)</div><div class="lc-type">청소·위생</div></div>
+        <div class="logo-card" data-cat="서비스"><div class="lc-icon">🏢</div><div class="lc-name">화성산업단지</div><div class="lc-type">서비스</div></div>
+        <div class="logo-card" data-cat="건설"><div class="lc-icon">🏗️</div><div class="lc-name">용인건축(주)</div><div class="lc-type">건설·건축</div></div>
+        <div class="logo-card" data-cat="제조"><div class="lc-icon">🏭</div><div class="lc-name">수원전자부품</div><div class="lc-type">제조·생산</div></div>
+        <div class="logo-card" data-cat="물류"><div class="lc-icon">🚛</div><div class="lc-name">동탄물류(주)</div><div class="lc-type">물류·운송</div></div>
+        <div class="logo-card" data-cat="청소"><div class="lc-icon">🧹</div><div class="lc-name">에코클린(주)</div><div class="lc-type">청소·위생</div></div>
+        <div class="logo-card" data-cat="서비스"><div class="lc-icon">🏢</div><div class="lc-name">권선유통(주)</div><div class="lc-type">서비스</div></div>
+        <div class="logo-card" data-cat="건설"><div class="lc-icon">🏗️</div><div class="lc-name">정조건설(주)</div><div class="lc-type">건설·건축</div></div>
+        <div class="logo-card" data-cat="제조"><div class="lc-icon">🏭</div><div class="lc-name">기흥산업(주)</div><div class="lc-type">제조·생산</div></div>
+        <div class="logo-card" data-cat="물류"><div class="lc-icon">🚛</div><div class="lc-name">수원종합물류</div><div class="lc-type">물류·운송</div></div>
+        <div class="logo-card" data-cat="서비스"><div class="lc-icon">🏢</div><div class="lc-name">팔달유통(주)</div><div class="lc-type">서비스</div></div>
+        <!-- 무한루프용 복제 -->
+        <div class="logo-card" data-cat="건설"><div class="lc-icon">🏗️</div><div class="lc-name">수원건설(주)</div><div class="lc-type">건설·건축</div></div>
+        <div class="logo-card" data-cat="제조"><div class="lc-icon">🏭</div><div class="lc-name">(주)한국제조</div><div class="lc-type">제조·생산</div></div>
+        <div class="logo-card" data-cat="물류"><div class="lc-icon">🚛</div><div class="lc-name">경기물류센터</div><div class="lc-type">물류·운송</div></div>
+        <div class="logo-card" data-cat="청소"><div class="lc-icon">🧹</div><div class="lc-name">클린서비스(주)</div><div class="lc-type">청소·위생</div></div>
+        <div class="logo-card" data-cat="서비스"><div class="lc-icon">🏢</div><div class="lc-name">화성산업단지</div><div class="lc-type">서비스</div></div>
+        <div class="logo-card" data-cat="건설"><div class="lc-icon">🏗️</div><div class="lc-name">용인건축(주)</div><div class="lc-type">건설·건축</div></div>
+        <div class="logo-card" data-cat="제조"><div class="lc-icon">🏭</div><div class="lc-name">수원전자부품</div><div class="lc-type">제조·생산</div></div>
+        <div class="logo-card" data-cat="물류"><div class="lc-icon">🚛</div><div class="lc-name">동탄물류(주)</div><div class="lc-type">물류·운송</div></div>
+        <div class="logo-card" data-cat="청소"><div class="lc-icon">🧹</div><div class="lc-name">에코클린(주)</div><div class="lc-type">청소·위생</div></div>
+        <div class="logo-card" data-cat="서비스"><div class="lc-icon">🏢</div><div class="lc-name">권선유통(주)</div><div class="lc-type">서비스</div></div>
+        <div class="logo-card" data-cat="건설"><div class="lc-icon">🏗️</div><div class="lc-name">정조건설(주)</div><div class="lc-type">건설·건축</div></div>
+        <div class="logo-card" data-cat="제조"><div class="lc-icon">🏭</div><div class="lc-name">기흥산업(주)</div><div class="lc-type">제조·생산</div></div>
+        <div class="logo-card" data-cat="물류"><div class="lc-icon">🚛</div><div class="lc-name">수원종합물류</div><div class="lc-type">물류·운송</div></div>
+        <div class="logo-card" data-cat="서비스"><div class="lc-icon">🏢</div><div class="lc-name">팔달유통(주)</div><div class="lc-type">서비스</div></div>
+      </div>
+    </div>
+    <div class="client-stats-row">
+      <div class="cstat"><span class="cs-num">540+</span><span class="cs-label">전체 거래처</span></div>
+      <div class="cstat-divider"></div>
+      <div class="cstat"><span class="cs-num">5년+</span><span class="cs-label">최장 거래 기간</span></div>
+      <div class="cstat-divider"></div>
+      <div class="cstat"><span class="cs-num">98%</span><span class="cs-label">재계약률</span></div>
+      <div class="cstat-divider"></div>
+      <div class="cstat"><span class="cs-num">수도권</span><span class="cs-label">전역 서비스</span></div>
+    </div>
+  </section>
+
+  <!-- ── 채용 공고 게시판 ── -->
+  <section id="jobs" class="jobs-section">
+    <div class="section-header">
+      <div class="section-badge">JOBS</div>
+      <h2 class="section-title">채용 공고</h2>
+      <p class="section-sub">브릿지웍스가 연결하는 일자리를 확인하세요</p>
+    </div>
+    <div class="jobs-filter-bar">
+      <div class="jf-search">
+        <span>🔍</span>
+        <input type="text" id="jobSearch" placeholder="직종, 지역, 업체명 검색..." oninput="filterJobs()">
+      </div>
+      <select class="jf-select" id="jobCatFilter" onchange="filterJobs()">
+        <option value="">전체 직종</option>
+        <option value="청소">🧹 청소용역</option>
+        <option value="생산">🏭 생산·제조</option>
+        <option value="물류">🚛 물류·배송</option>
+        <option value="건설">🏗️ 건설·건축</option>
+        <option value="경비">🔒 경비·보안</option>
+        <option value="기타">📋 기타</option>
+      </select>
+      <select class="jf-select" id="jobRegionFilter" onchange="filterJobs()">
+        <option value="">전체 지역</option>
+        <option value="수원">수원시</option>
+        <option value="화성">화성시</option>
+        <option value="용인">용인시</option>
+        <option value="안양">안양시</option>
+      </select>
+      <select class="jf-select" id="jobTypeFilter" onchange="filterJobs()">
+        <option value="">고용형태</option>
+        <option value="일용직">일용직</option>
+        <option value="단기">단기계약</option>
+        <option value="장기">장기계약</option>
+        <option value="파견">파견직</option>
+      </select>
+    </div>
+    <div class="jobs-grid" id="jobsGrid">
+      <div class="job-card" data-cat="청소" data-region="수원" data-type="일용직">
+        <div class="jc-top">
+          <div class="jc-badges"><span class="jc-badge urgent">🔥 급구</span><span class="jc-badge type">일용직</span></div>
+          <div class="jc-date">2026.02.20</div>
+        </div>
+        <div class="jc-title">아파트 청소용역 일용직 모집</div>
+        <div class="jc-company">🏢 수원 권선구 소재 아파트 단지</div>
+        <div class="jc-info-row">
+          <span>📍 수원시 권선구</span><span>💰 일당 130,000원~</span><span>👤 5명 모집</span>
+        </div>
+        <div class="jc-tags"><span class="jc-tag">🧹 청소용역</span><span class="jc-tag">주5일</span><span class="jc-tag">남녀무관</span></div>
+        <button class="jc-apply-btn" onclick="applyJob(this,'아파트 청소용역 일용직')">지원 신청</button>
+      </div>
+      <div class="job-card" data-cat="생산" data-region="화성" data-type="파견">
+        <div class="jc-top">
+          <div class="jc-badges"><span class="jc-badge type">파견직</span><span class="jc-badge long">장기</span></div>
+          <div class="jc-date">2026.02.18</div>
+        </div>
+        <div class="jc-title">제조공장 생산직 파견 (3개월↑)</div>
+        <div class="jc-company">🏭 화성시 소재 전자부품 제조업체</div>
+        <div class="jc-info-row">
+          <span>📍 화성시 향남읍</span><span>💰 월 220만원~</span><span>👤 10명 모집</span>
+        </div>
+        <div class="jc-tags"><span class="jc-tag">🏭 생산·조립</span><span class="jc-tag">주5일(2교대)</span><span class="jc-tag">4대보험</span></div>
+        <button class="jc-apply-btn" onclick="applyJob(this,'제조공장 생산직 파견')">지원 신청</button>
+      </div>
+      <div class="job-card" data-cat="물류" data-region="수원" data-type="단기">
+        <div class="jc-top">
+          <div class="jc-badges"><span class="jc-badge urgent">🔥 급구</span><span class="jc-badge type">단기계약</span></div>
+          <div class="jc-date">2026.02.17</div>
+        </div>
+        <div class="jc-title">물류창고 상하차 작업자</div>
+        <div class="jc-company">🚛 수원 팔달구 물류센터</div>
+        <div class="jc-info-row">
+          <span>📍 수원시 팔달구</span><span>💰 일당 140,000원~</span><span>👤 8명 모집</span>
+        </div>
+        <div class="jc-tags"><span class="jc-tag">🚛 물류</span><span class="jc-tag">주6일</span><span class="jc-tag">체력우대</span></div>
+        <button class="jc-apply-btn" onclick="applyJob(this,'물류창고 상하차 작업자')">지원 신청</button>
+      </div>
+      <div class="job-card" data-cat="건설" data-region="용인" data-type="일용직">
+        <div class="jc-top">
+          <div class="jc-badges"><span class="jc-badge type">일용직</span></div>
+          <div class="jc-date">2026.02.15</div>
+        </div>
+        <div class="jc-title">건설현장 일반공 / 잡부</div>
+        <div class="jc-company">🏗️ 용인시 기흥구 신축현장</div>
+        <div class="jc-info-row">
+          <span>📍 용인시 기흥구</span><span>💰 일당 150,000원~</span><span>👤 15명 모집</span>
+        </div>
+        <div class="jc-tags"><span class="jc-tag">🏗️ 건설</span><span class="jc-tag">남성우대</span><span class="jc-tag">경험자우대</span></div>
+        <button class="jc-apply-btn" onclick="applyJob(this,'건설현장 일반공')">지원 신청</button>
+      </div>
+      <div class="job-card" data-cat="경비" data-region="수원" data-type="장기">
+        <div class="jc-top">
+          <div class="jc-badges"><span class="jc-badge long">장기</span><span class="jc-badge type">파견직</span></div>
+          <div class="jc-date">2026.02.14</div>
+        </div>
+        <div class="jc-title">아파트 단지 경비원 (장기)</div>
+        <div class="jc-company">🔒 수원시 권선구 대단지 아파트</div>
+        <div class="jc-info-row">
+          <span>📍 수원시 권선구</span><span>💰 월 230만원~</span><span>👤 2명 모집</span>
+        </div>
+        <div class="jc-tags"><span class="jc-tag">🔒 경비</span><span class="jc-tag">주야 2교대</span><span class="jc-tag">4대보험</span></div>
+        <button class="jc-apply-btn" onclick="applyJob(this,'아파트 단지 경비원')">지원 신청</button>
+      </div>
+      <div class="job-card" data-cat="청소" data-region="화성" data-type="장기">
+        <div class="jc-top">
+          <div class="jc-badges"><span class="jc-badge long">장기</span><span class="jc-badge type">파견직</span></div>
+          <div class="jc-date">2026.02.12</div>
+        </div>
+        <div class="jc-title">사무실·공장 정기청소 전담 (장기)</div>
+        <div class="jc-company">🧹 화성시 동탄 소재 기업</div>
+        <div class="jc-info-row">
+          <span>📍 화성시 동탄</span><span>💰 월 200만원~</span><span>👤 3명 모집</span>
+        </div>
+        <div class="jc-tags"><span class="jc-tag">🧹 청소용역</span><span class="jc-tag">주5일</span><span class="jc-tag">여성가능</span></div>
+        <button class="jc-apply-btn" onclick="applyJob(this,'사무실 정기청소 전담')">지원 신청</button>
+      </div>
+    </div>
+    <div class="jobs-empty hidden" id="jobsEmpty">😔 검색 결과가 없습니다. 다른 조건으로 검색해보세요.</div>
+    <div style="text-align:center;margin-top:32px">
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:12px">원하는 공고가 없으신가요? 구직 신청을 남겨주시면 맞춤 매칭해드립니다.</p>
+      <a class="btn btn-gold btn-lg" href="#contact" onclick="navScroll(event,'contact')">📝 구직 신청하기</a>
+    </div>
+  </section>
+
+  <!-- ── 이용 프로세스 ── -->
+  <section id="process" class="process-section">
+    <div class="section-header">
+      <div class="section-badge">PROCESS</div>
+      <h2 class="section-title">이용 절차</h2>
+      <p class="section-sub">간편하게 인력을 요청하세요</p>
+    </div>
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="ps-circle">📞</div>
+        <div class="ps-connector"></div>
+        <div class="ps-title">상담 신청</div>
+        <div class="ps-desc">전화 또는 온라인으로 인력 요청</div>
+      </div>
+      <div class="process-step">
+        <div class="ps-circle">🔍</div>
+        <div class="ps-connector"></div>
+        <div class="ps-title">인력 매칭</div>
+        <div class="ps-desc">보유 인력 중 최적 매칭</div>
+      </div>
+      <div class="process-step">
+        <div class="ps-circle">📋</div>
+        <div class="ps-connector"></div>
+        <div class="ps-title">계약 체결</div>
+        <div class="ps-desc">근로계약·파견계약 체결</div>
+      </div>
+      <div class="process-step">
+        <div class="ps-circle">🚀</div>
+        <div class="ps-connector"></div>
+        <div class="ps-title">인력 투입</div>
+        <div class="ps-desc">즉시 현장 배치 가능</div>
+      </div>
+      <div class="process-step last">
+        <div class="ps-circle">✅</div>
+        <div class="ps-title">사후 관리</div>
+        <div class="ps-desc">지속적인 모니터링</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 카카오맵 위치 섹션 ── -->
+  <section id="location" class="location-section">
+    <div class="section-header">
+      <div class="section-badge">LOCATION</div>
+      <h2 class="section-title">오시는 길</h2>
+      <p class="section-sub">경기도 수원시 권선구 정조로 458, 301호</p>
+    </div>
+    <div class="location-container">
+      <!-- 지도 영역 -->
+      <div class="map-wrapper">
+        <div id="kakaoMap" class="kakao-map-box">
+          <!-- 카카오 API 키 미설정 시 대체 표시 -->
+          <div class="map-fallback" id="mapFallback">
+            <div class="mf-icon">📍</div>
+            <div class="mf-addr">경기도 수원시 권선구 정조로 458, 301호</div>
+            <a class="mf-btn" href="https://map.kakao.com/link/search/경기도 수원시 권선구 정조로 458" target="_blank">
+              카카오맵으로 보기 →
+            </a>
+            <a class="mf-btn mf-btn-naver" href="https://map.naver.com/v5/search/경기도 수원시 권선구 정조로 458" target="_blank">
+              네이버지도로 보기 →
+            </a>
+          </div>
+        </div>
+        <!-- 지도 하단 바로가기 버튼 -->
+        <div class="map-actions">
+          <a class="map-action-btn kakao" href="https://map.kakao.com/link/search/브릿지웍스 수원시 권선구 정조로 458" target="_blank">
+            🗺️ 카카오맵
+          </a>
+          <a class="map-action-btn naver" href="https://map.naver.com/v5/search/경기도 수원시 권선구 정조로 458" target="_blank">
+            🗺️ 네이버지도
+          </a>
+          <a class="map-action-btn google" href="https://www.google.com/maps/search/경기도+수원시+권선구+정조로+458" target="_blank">
+            🗺️ 구글지도
+          </a>
+        </div>
+      </div>
+      <!-- 주소 정보 -->
+      <div class="location-info">
+        <div class="li-card">
+          <div class="li-title">📍 주소</div>
+          <div class="li-content">경기도 수원시 권선구 정조로 458, 301호 (세류동)</div>
+        </div>
+        <div class="li-card">
+          <div class="li-title">🚌 대중교통</div>
+          <div class="li-content">
+            <div class="li-row"><span class="li-badge bus">버스</span> 수원역 환승 → 정조로 방면</div>
+            <div class="li-row"><span class="li-badge subway">지하철</span> 1호선 수원역 하차 후 버스 환승</div>
+          </div>
+        </div>
+        <div class="li-card">
+          <div class="li-title">🚗 자가용</div>
+          <div class="li-content">수원IC → 권선구청 방면 → 정조로 진입</div>
+        </div>
+        <div class="li-card">
+          <div class="li-title">🅿️ 주차</div>
+          <div class="li-content">건물 내 주차 가능 (방문 전 연락 권장)</div>
+        </div>
+        <div class="li-card li-card-highlight">
+          <div class="li-title">⏰ 운영시간</div>
+          <div class="li-content">
+            <div>평일: 09:00 ~ 18:00</div>
+            <div>토요일: 09:00 ~ 13:00</div>
+            <div style="color:var(--gold);font-weight:700">긴급 인력 요청: 24시간</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 문의 섹션 ── -->
+  <section class="contact-section" id="contact">
+    <div class="section-header">
+      <div class="section-badge">CONTACT</div>
+      <h2 class="section-title">문의 및 신청</h2>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-form-card">
+        <h3 style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:20px">📝 구인/구직 신청</h3>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <button class="btn btn-primary" style="flex:1" id="tabHire" onclick="switchContactTab('hire')">구인 신청</button>
+          <button class="btn btn-outline" style="flex:1" id="tabSeek" onclick="switchContactTab('seek')">구직 신청</button>
+        </div>
+        <div class="form-grid cols-1" style="gap:12px">
+          <div class="form-field">
+            <label class="form-label" id="contactNameLabel">업체명</label>
+            <input class="form-input" id="contactName" placeholder="업체명 또는 이름">
+          </div>
+          <div class="form-field">
+            <label class="form-label">연락처</label>
+            <input class="form-input" id="contactPhone" placeholder="010-0000-0000" oninput="formatPhone(this)">
+          </div>
+          <div class="form-field">
+            <label class="form-label">업종/직종</label>
+            <input class="form-input" id="contactJob" placeholder="예: 청소용역, 생산직, 경비">
+          </div>
+          <div class="form-field">
+            <label class="form-label">문의 내용</label>
+            <textarea class="form-textarea" id="contactMsg" rows="4" placeholder="필요 인원, 기간, 지역 등을 적어주세요"></textarea>
+          </div>
+        </div>
+        <!-- 발송 상태 표시 -->
+        <div id="submitStatus" class="submit-status hidden"></div>
+        <button class="btn btn-gold" id="submitBtn" style="width:100%;margin-top:16px;padding:14px;font-size:14px" onclick="submitContact()">
+          📨 신청하기
+        </button>
+        <div style="margin-top:8px;font-size:11px;color:var(--gray-500);text-align:center">
+          📬 신청 즉시 관리자에게 카카오톡 알림이 전송됩니다
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-body">
+            <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:16px">📍 연락처</div>
+            <div style="line-height:2.2;font-size:13px">
+              <div><strong>회사명</strong>: 브릿지웍스 주식회사</div>
+              <div><strong>대표자</strong>: 박재관</div>
+              <div><strong>주소</strong>: 경기도 수원시 권선구 정조로 458, 301호</div>
+              <div><strong>사업자번호</strong>: 841-86-03358</div>
+              <div><strong>파견허가</strong>: 2025-23호</div>
+              <div style="margin-top:8px"><strong style="color:var(--gold-dark)">📞 전화: 연락처 등록 예정</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="background:linear-gradient(135deg,var(--navy),var(--navy-light));color:white;margin-bottom:16px">
+          <div class="card-body">
+            <div style="font-size:14px;font-weight:800;color:var(--gold-light);margin-bottom:12px">⚡ 긴급 인력 요청</div>
+            <p style="font-size:12px;opacity:0.8;line-height:1.8">당일·익일 급한 인력이 필요하신가요?<br>등록된 3,742명의 인력 풀에서 즉시 매칭해드립니다.</p>
+            <div style="margin-top:16px;font-size:20px;font-weight:900;color:var(--gold)">24시간 긴급 대응</div>
+          </div>
+        </div>
+        <!-- 카카오 알림 설정 카드 -->
+        <div class="card kakao-setup-card">
+          <div class="card-body">
+            <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px">🔔 카카오톡 알림 설정</div>
+            <div style="font-size:11px;color:var(--gray-500);margin-bottom:12px">관리자로 카카오 로그인하면<br>신청 접수 시 즉시 카카오톡 알림을 받습니다</div>
+            <div id="kakaoLoginStatus2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 카카오 플로팅 버튼 ── -->
+  <div class="kakao-float" id="kakaoFloat">
+    <button class="kakao-float-btn" onclick="toggleKakaoMenu()" title="카카오 상담">💬</button>
+    <div class="kakao-tooltip" id="kakaoTooltip">
+      <div class="kt-arrow"></div>
+      <div class="kt-title">💬 카카오 채널 상담</div>
+      <div class="kt-desc">평일 09:00 ~ 18:00<br>긴급 문의는 24시간 가능</div>
+      <a class="kt-btn" href="https://pf.kakao.com/_YOUR_CHANNEL" target="_blank" onclick="closeKakaoMenu()">채널 바로가기 →</a>
+      <a class="kt-btn kt-btn-outline" href="#contact" onclick="navScroll(event,'contact');closeKakaoMenu()">구인/구직 신청</a>
+    </div>
+  </div>
+
+  <!-- ── 푸터 ── -->
+  <footer class="site-footer">
+    <div>
+      <strong>브릿지웍스 주식회사</strong> &nbsp;|&nbsp;
+      대표이사: 박재관 &nbsp;|&nbsp;
+      사업자등록번호: 841-86-03358 &nbsp;|&nbsp;
+      근로자파견사업허가: 2025-23
+    </div>
+    <div>경기도 수원시 권선구 정조로 458, 301호(세류동)</div>
+    <div style="margin-top:8px">© 2025 BridgeWorks Co., Ltd. All rights reserved.</div>
   </footer>
+</div><!-- /#websitePage -->
+
+<!-- ===================================================
+     스크립트 로드
+     =================================================== -->
+<script src="../static/js/app.js"></script>
+<script src="../static/js/notification.js"></script>
+<script>
+/* ────────────────────────────────────────────────────
+   홈페이지 공통 유틸
+   ──────────────────────────────────────────────────── */
+
+// 홈페이지 열기/닫기
+function openWebsite() {
+  document.getElementById('websitePage').classList.remove('hidden');
+  document.getElementById('appPage').classList.add('hidden');
+  initKakaoMap();
+  startCountUpAll();
+}
+function closeWebsite() {
+  document.getElementById('websitePage').classList.add('hidden');
+  document.getElementById('appPage').classList.remove('hidden');
+  closeMobileNav();
+}
+
+// 스크롤 네비게이션 (websitePage 내부 스크롤)
+function navScroll(e, id) {
+  e && e.preventDefault();
+  const page = document.getElementById('websitePage');
+  const el   = document.getElementById(id);
+  if (!el || !page) return;
+  const offset = el.getBoundingClientRect().top + page.scrollTop - 70;
+  page.scrollTo({ top: offset, behavior: 'smooth' });
+}
+
+/* ────────────────────────────────────────────────────
+   모바일 햄버거 메뉴
+   ──────────────────────────────────────────────────── */
+function toggleMobileNav() {
+  const drawer  = document.getElementById('mobileNavDrawer');
+  const overlay = document.getElementById('mobileNavOverlay');
+  const btn     = document.getElementById('hamburgerBtn');
+  const isOpen  = drawer.classList.contains('open');
+  if (isOpen) { closeMobileNav(); }
+  else {
+    drawer.classList.add('open');
+    overlay.classList.add('show');
+    btn.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+function closeMobileNav() {
+  document.getElementById('mobileNavDrawer').classList.remove('open');
+  document.getElementById('mobileNavOverlay').classList.remove('show');
+  document.getElementById('hamburgerBtn').classList.remove('active');
+  document.body.style.overflow = '';
+}
+function mobileNavGo(id) {
+  closeMobileNav();
+  setTimeout(() => navScroll(null, id), 300);
+}
+
+// 스크롤 시 네비 투명도 + 활성 링크
+(function() {
+  const page = document.getElementById('websitePage');
+  if (!page) return;
+  page.addEventListener('scroll', function() {
+    const nav = document.getElementById('websiteNav');
+    if (!nav) return;
+    nav.classList.toggle('scrolled', page.scrollTop > 60);
+    // 활성 섹션 표시
+    const sections = ['home','about','services','clients','jobs','process','location','contact'];
+    let current = 'home';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top - 80 <= 0) current = id;
+    });
+    document.querySelectorAll('.website-nav-links a').forEach(a => {
+      const href = a.getAttribute('href').replace('#','');
+      a.classList.toggle('active', href === current);
+    });
+  });
+})();
+
+/* ────────────────────────────────────────────────────
+   카카오맵 초기화
+   ──────────────────────────────────────────────────── */
+let _mapInited = false;
+function initKakaoMap() {
+  if (_mapInited) return;
+  if (!window.kakao || !window.kakao.maps) {
+    // API 키 미설정 → fallback 표시
+    document.getElementById('mapFallback').style.display = 'flex';
+    return;
+  }
+  _mapInited = true;
+  document.getElementById('mapFallback').style.display = 'none';
+
+  const container = document.getElementById('kakaoMap');
+  const options = {
+    center: new kakao.maps.LatLng(37.2532, 127.0182), // 수원시 권선구 정조로
+    level: 3
+  };
+  const map = new kakao.maps.Map(container, options);
+
+  // 커스텀 마커
+  const markerPos = new kakao.maps.LatLng(37.2532, 127.0182);
+  const marker    = new kakao.maps.Marker({ position: markerPos });
+  marker.setMap(map);
+
+  // 인포윈도우
+  const infoContent = `
+    <div style="padding:12px 16px;font-family:'Noto Sans KR',sans-serif;min-width:220px">
+      <div style="font-size:14px;font-weight:800;color:#0a1f44;margin-bottom:4px">🏢 브릿지웍스 주식회사</div>
+      <div style="font-size:12px;color:#7a8aaa;line-height:1.7">
+        경기도 수원시 권선구 정조로 458, 301호<br>
+        사업자: 841-86-03358<br>
+        <a href="https://map.kakao.com/link/to/브릿지웍스,37.2532,127.0182" target="_blank"
+           style="color:#c9a84c;font-weight:700">길찾기 →</a>
+      </div>
+    </div>`;
+  const infowindow = new kakao.maps.InfoWindow({ content: infoContent });
+  infowindow.open(map, marker);
+
+  // 마커 클릭 시 인포윈도우 토글
+  kakao.maps.event.addListener(marker, 'click', function() {
+    infowindow.open(map, marker);
+  });
+
+  // 지도 컨트롤
+  map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+  map.addControl(new kakao.maps.MapTypeControl(), kakao.maps.ControlPosition.TOPRIGHT);
+}
+
+/* ────────────────────────────────────────────────────
+   숫자 카운트업 애니메이션
+   ──────────────────────────────────────────────────── */
+function countUp(el, target, duration) {
+  let start = 0, step = target / (duration / 16);
+  const t = setInterval(() => {
+    start = Math.min(start + step, target);
+    el.textContent = Math.floor(start).toLocaleString() + '+';
+    if (start >= target) clearInterval(t);
+  }, 16);
+}
+function startCountUpAll() {
+  document.querySelectorAll('[data-count]').forEach(el => {
+    countUp(el, parseInt(el.dataset.count), 1500);
+  });
+}
+
+/* ────────────────────────────────────────────────────
+   문의 폼
+   ──────────────────────────────────────────────────── */
+let _contactType = '구인';
+function switchContactTab(tab) {
+  const isHire = tab === 'hire';
+  _contactType = isHire ? '구인' : '구직';
+  document.getElementById('tabHire').className = isHire ? 'btn btn-primary' : 'btn btn-outline';
+  document.getElementById('tabSeek').className = isHire ? 'btn btn-outline' : 'btn btn-primary';
+  document.getElementById('contactNameLabel').textContent = isHire ? '업체명' : '이름';
+  document.getElementById('contactName').placeholder = isHire ? '업체명' : '이름';
+}
+
+function formatPhone(input) {
+  let v = input.value.replace(/\D/g,'');
+  if (v.length <= 3) input.value = v;
+  else if (v.length <= 7) input.value = v.slice(0,3) + '-' + v.slice(3);
+  else input.value = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7,11);
+}
+
+async function submitContact() {
+  const name  = document.getElementById('contactName').value.trim();
+  const phone = document.getElementById('contactPhone').value.trim();
+  const job   = document.getElementById('contactJob').value.trim();
+  const msg   = document.getElementById('contactMsg').value.trim();
+
+  if (!name || !phone) {
+    showStatus('업체명/이름과 연락처를 입력해주세요.', 'error');
+    return;
+  }
+  if (phone.replace(/\D/g,'').length < 10) {
+    showStatus('올바른 연락처를 입력해주세요.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 전송 중...';
+  showStatus('신청을 접수하고 있습니다...', 'info');
+
+  const data = { type: _contactType, name, phone, job, msg };
+
+  try {
+    const result = await BW_NOTIFY.send(data);
+
+    // 성공
+    showStatus('✅ 신청이 접수되었습니다! 빠른 시간 내 연락드리겠습니다.', 'success');
+    if (typeof Toast !== 'undefined') Toast.show('신청 접수 완료 — 카카오톡 알림 발송됨', 'success', 4000);
+
+    // 폼 초기화
+    document.getElementById('contactName').value = '';
+    document.getElementById('contactPhone').value = '';
+    document.getElementById('contactJob').value = '';
+    document.getElementById('contactMsg').value = '';
+    btn.textContent = '✅ 신청완료';
+    setTimeout(() => { btn.disabled = false; btn.textContent = '📨 신청하기'; }, 5000);
+
+  } catch(e) {
+    showStatus('전송 중 오류가 발생했습니다. 직접 전화로 문의해주세요.', 'error');
+    btn.disabled = false;
+    btn.textContent = '📨 신청하기';
+  }
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('submitStatus');
+  el.textContent = msg;
+  el.className = 'submit-status show ' + type;
+}
+
+/* ────────────────────────────────────────────────────
+   고객사 필터
+   ──────────────────────────────────────────────────── */
+function filterClients(cat, btn) {
+  document.querySelectorAll('.client-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.logo-card').forEach(card => {
+    card.style.display = (cat === 'all' || card.dataset.cat === cat) ? 'flex' : 'none';
+  });
+}
+
+/* ────────────────────────────────────────────────────
+   채용 공고 필터
+   ──────────────────────────────────────────────────── */
+function filterJobs() {
+  const kw     = (document.getElementById('jobSearch').value || '').toLowerCase();
+  const cat    = document.getElementById('jobCatFilter').value;
+  const region = document.getElementById('jobRegionFilter').value;
+  const type   = document.getElementById('jobTypeFilter').value;
+  let visible  = 0;
+  document.querySelectorAll('#jobsGrid .job-card').forEach(card => {
+    const txt   = card.textContent.toLowerCase();
+    const show  = (!kw || txt.includes(kw)) &&
+                  (!cat    || card.dataset.cat.includes(cat)) &&
+                  (!region || card.dataset.region.includes(region)) &&
+                  (!type   || card.dataset.type.includes(type));
+    card.style.display = show ? 'flex' : 'none';
+    if (show) visible++;
+  });
+  document.getElementById('jobsEmpty').classList.toggle('hidden', visible > 0);
+}
+
+function applyJob(btn, title) {
+  btn.textContent = '✅ 신청완료';
+  btn.disabled = true;
+  btn.style.background = 'var(--green)';
+  // 카카오 알림 발송
+  BW_NOTIFY.send({ type: '구직(채용공고)', name: '홈페이지 방문자', phone: '-', job: title, msg: '채용공고 지원' });
+  if (typeof Toast !== 'undefined') Toast.show(`[${title}] 지원 신청이 접수되었습니다!`, 'success', 4000);
+}
+
+/* ────────────────────────────────────────────────────
+   카카오 플로팅
+   ──────────────────────────────────────────────────── */
+function toggleKakaoMenu() {
+  document.getElementById('kakaoTooltip').classList.toggle('show');
+}
+function closeKakaoMenu() {
+  document.getElementById('kakaoTooltip').classList.remove('show');
+}
+document.addEventListener('click', function(e) {
+  const f = document.getElementById('kakaoFloat');
+  if (f && !f.contains(e.target)) closeKakaoMenu();
+});
+
+/* ────────────────────────────────────────────────────
+   카카오 로그인 상태 양쪽 카드에 동기화
+   ──────────────────────────────────────────────────── */
+const _origUpdate = BW_NOTIFY.updateKakaoStatus.bind(BW_NOTIFY);
+function syncKakaoStatus() {
+  const token = localStorage.getItem('bw_kakao_token');
+  const exp   = parseInt(localStorage.getItem('bw_kakao_token_exp') || '0');
+  const valid  = token && Date.now() < exp;
+  ['kakaoLoginStatus','kakaoLoginStatus2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = valid
+      ? `<span class="kls-on">🟢 카카오 알림 활성</span> <button class="btn btn-sm btn-outline" onclick="BW_NOTIFY.kakaoAdminLogout();syncKakaoStatus()">해제</button>`
+      : `<span class="kls-off">🔴 카카오 알림 비활성</span><br><button class="btn btn-sm btn-gold" style="margin-top:8px" onclick="BW_NOTIFY.kakaoAdminLogin();setTimeout(syncKakaoStatus,2000)">카카오 로그인</button>`;
+  });
+}
+document.addEventListener('DOMContentLoaded', syncKakaoStatus);
+</script>
 </body>
 </html>
