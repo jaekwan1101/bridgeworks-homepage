@@ -28,7 +28,7 @@ window.BW_CONFIG = {
   // ★ 여기 3줄만 실제 값으로 교체하세요
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   KAKAO_JS_KEY:      '63edb182ab01170c102c663749231293',   // ← 교체 필요
-  GAS_WEBHOOK_URL:   'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL', // ← 교체 필요
+  GAS_WEBHOOK_URL:   'https://script.google.com/macros/s/AKfycbw0gEMXe85X7UkdUo62BHxJImr5wQ6ys_kyIiIrr3DWhmUTt4jRFI7O259HzzgHUJcv/exec', // ← 교체 필요
   ADMIN_PASSWORD:    'Qkrworhks1@#',                 // ← 관리자 비밀번호
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
