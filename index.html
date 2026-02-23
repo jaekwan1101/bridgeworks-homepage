@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <!-- 카카오 SDK (지도 + 카카오톡) -->
   <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+<script src="bw-config.js" onerror="console.warn('bw-config.js 없음')"></script>
   <!-- 카카오 맵 JS API -->
   <script type="text/javascript"
     src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_MAP_APP_KEY&libraries=services"></script>
@@ -1452,7 +1453,7 @@ input, select, textarea, button {
         인재와 기업을<br>연결하는 <span class="highlight">브릿지</span>
       </h1>
       <p class="hero-subtitle">
-        인력공급·근로자파견·청소용역 전문<br>
+        수원·화성·용인 지역 인력공급·근로자파견·청소용역 전문<br>
         브릿지웍스 주식회사가 최적의 인력을 연결해드립니다
       </p>
       <div class="hero-buttons">
@@ -1519,7 +1520,7 @@ input, select, textarea, button {
     <div class="section-header">
       <div class="section-badge">OUR CLIENTS</div>
       <h2 class="section-title">주요 거래처</h2>
-      <p class="section-sub">전국 전 지역 1000여 개 기업과 함께합니다</p>
+      <p class="section-sub">수원·화성·용인 지역 540여 개 기업과 함께합니다</p>
     </div>
     <div class="client-tabs">
       <button class="client-tab active" onclick="filterClients('all',this)">전체</button>
@@ -3195,13 +3196,14 @@ window.addEventListener('DOMContentLoaded', () => {
 const BW_NOTIFY = (() => {
 
   /* ─── ① 설정 ────────────────────────────── */
-  const CONFIG = {
-    GAS_WEBHOOK_URL: 'YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL',
-    KAKAO_JS_KEY:    'YOUR_KAKAO_JAVASCRIPT_APP_KEY',
-    ADMIN_EMAIL:     'admin@bridgeworks.co.kr',
-    COMPANY_NAME:    '브릿지웍스 주식회사',
-    MAX_FILE_SIZE_MB: 10,   // 첨부 파일 최대 크기 (MB)
-  };
+  // bw-config.js 우선, 없으면 기본값 사용
+  const CONFIG = Object.assign({
+    GAS_WEBHOOK_URL:  'YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL',
+    KAKAO_JS_KEY:     'YOUR_KAKAO_JAVASCRIPT_APP_KEY',
+    ADMIN_EMAIL:      'admin@bridgeworks.co.kr',
+    COMPANY_NAME:     '브릿지웍스 주식회사',
+    MAX_FILE_SIZE_MB: 10,
+  }, window.BW_CONFIG || {});
 
   /* ─── ② 카카오 SDK 초기화 ────────────────── */
   function initKakao() {
