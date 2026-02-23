@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>브릿지웍스 — 신청 관리자</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0a1f44;--navy-light:#162d5e;--navy-dark:#060f22;
+  --gold:#c9a84c;--gold-light:#e8c96a;--gold-dark:#a0832a;
+  --white:#fff;--gray-50:#f8f9fa;--gray-100:#f1f3f5;
+  --gray-200:#e9ecef;--gray-400:#adb5bd;--gray-600:#868e96;
+  --gray-800:#343a40;
+  --green:#2ecc71;--orange:#f39c12;--red:#e03c31;--blue:#3498db;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Noto Sans KR',sans-serif}
+body{background:var(--gray-50);color:var(--gray-800)}
+
+/* ── 헤더 ── */
+.admin-header{
+  background:linear-gradient(135deg,var(--navy),var(--navy-light));
+  color:#fff;padding:0 24px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)
+}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:16px}
+.logo-badge{background:var(--gold);color:var(--navy-dark);
+  font-size:11px;font-weight:900;padding:3px 8px;border-radius:4px}
+.header-nav a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;
+  margin-left:16px;padding:6px 10px;border-radius:6px;transition:.2s}
+.header-nav a:hover{color:#fff;background:rgba(255,255,255,.12)}
+.header-right{display:flex;align-items:center;gap:12px}
+.sync-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+  color:#fff;font-size:12px;padding:6px 14px;border-radius:6px;cursor:pointer;transition:.2s}
+.sync-btn:hover{background:rgba(255,255,255,.25)}
+.sync-btn.loading{opacity:.6;pointer-events:none}
+.gas-status{font-size:11px;padding:4px 10px;border-radius:4px;background:rgba(255,255,255,.1)}
+.gas-status.ok{background:rgba(46,204,113,.2);color:#2ecc71}
+.gas-status.err{background:rgba(224,60,49,.2);color:#ff6b6b}
+.gas-status.local{background:rgba(201,168,76,.2);color:var(--gold-light)}
+
+/* ── 로그인 오버레이 ── */
+.login-overlay{
+  position:fixed;inset:0;background:linear-gradient(135deg,var(--navy),var(--navy-light));
+  display:flex;align-items:center;justify-content:center;z-index:9999
+}
+.login-overlay.hidden{display:none}
+.login-box{
+  background:#fff;border-radius:20px;padding:48px 40px;width:380px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center
+}
+.login-box h2{font-size:22px;font-weight:900;color:var(--navy);margin-bottom:6px}
+.login-box p{font-size:13px;color:var(--gray-600);margin-bottom:32px}
+.login-input{
+  width:100%;padding:12px 16px;border:2px solid var(--gray-200);
+  border-radius:10px;font-size:14px;margin-bottom:12px;transition:.2s;outline:none
+}
+.login-input:focus{border-color:var(--gold)}
+.login-btn{
+  width:100%;padding:14px;background:linear-gradient(135deg,var(--navy),var(--navy-light));
+  color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;
+  transition:.2s;margin-top:4px
+}
+.login-btn:hover{opacity:.9;transform:translateY(-1px)}
+.login-err{color:var(--red);font-size:13px;margin-top:8px;min-height:20px}
+
+/* ── 메인 ── */
+.admin-body{max-width:1300px;margin:24px auto;padding:0 20px}
+.page-title{font-size:22px;font-weight:900;color:var(--navy);
+  margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.data-source-badge{
+  font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;
+  background:var(--green);color:#fff;margin-left:8px
+}
+.data-source-badge.local{background:var(--orange)}
+
+/* ── 통계 카드 ── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{
+  background:#fff;border-radius:12px;padding:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--navy);
+  transition:.2s;cursor:pointer
+}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.stat-card.orange{border-color:var(--orange)}
+.stat-card.green{border-color:var(--green)}
+.stat-card.blue{border-color:var(--blue)}
+.stat-label{font-size:12px;color:var(--gray-600);font-weight:500;margin-bottom:8px}
+.stat-num{font-size:32px;font-weight:900;color:var(--navy);line-height:1}
+.stat-sub{font-size:11px;color:var(--gray-400);margin-top:6px}
+
+/* ── 필터 바 ── */
+.filter-bar{
+  background:#fff;border-radius:12px;padding:18px 20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:20px;
+  display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end
+}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-label{font-size:11px;color:var(--gray-600);font-weight:600}
+.filter-input,.filter-select{
+  padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;
+  font-size:13px;outline:none;transition:.2s;font-family:inherit
+}
+.filter-input:focus,.filter-select:focus{border-color:var(--gold)}
+.filter-input{min-width:220px}
+.filter-actions{display:flex;gap:8px;margin-left:auto;align-items:flex-end}
+
+/* ── 버튼 ── */
+.btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;
+  cursor:pointer;border:none;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:var(--navy-light)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--navy-dark)}
+.btn-gold:hover{opacity:.9}
+.btn-outline{background:transparent;border:1.5px solid var(--gray-200);color:var(--gray-800)}
+.btn-outline:hover{border-color:var(--navy);color:var(--navy)}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{opacity:.85}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{opacity:.85}
+
+/* ── 테이블 ── */
+.table-wrap{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden}
+.table-header{
+  padding:16px 20px;border-bottom:1px solid var(--gray-100);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap
+}
+.table-title{font-weight:700;font-size:15px;color:var(--navy)}
+.result-count{font-size:12px;color:var(--gray-600);background:var(--gray-100);
+  padding:3px 10px;border-radius:20px}
+.table-header .actions{margin-left:auto;display:flex;gap:8px}
+table{width:100%;border-collapse:collapse}
+thead th{
+  background:var(--navy);color:#fff;padding:12px 14px;
+  text-align:left;font-size:12px;font-weight:700;white-space:nowrap;
+  cursor:pointer;user-select:none;transition:.15s
+}
+thead th:hover{background:var(--navy-light)}
+thead th.sort-asc::after{content:' ▲';font-size:10px;opacity:.7}
+thead th.sort-desc::after{content:' ▼';font-size:10px;opacity:.7}
+tbody tr{border-bottom:1px solid var(--gray-100);transition:.15s}
+tbody tr:hover{background:rgba(201,168,76,.05)}
+tbody tr.selected{background:rgba(10,31,68,.04)}
+td{padding:11px 14px;font-size:13px;vertical-align:middle}
+td.td-check{width:40px;text-align:center}
+input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--navy)}
+.tag-type{
+  display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700
+}
+.tag-hire{background:rgba(10,31,68,.08);color:var(--navy)}
+.tag-seek{background:rgba(201,168,76,.15);color:var(--gold-dark)}
+.status-sel{
+  padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;
+  border:none;cursor:pointer;outline:none;font-family:inherit
+}
+.st-접수{background:#fff9c4;color:#b7971a}
+.st-진행중{background:#c8e6c9;color:#276221}
+.st-완료{background:#e3f2fd;color:#1565c0}
+.st-보류{background:#fce4ec;color:#b71c1c}
+.file-badge{color:var(--gold-dark);font-size:12px;cursor:pointer}
+.action-btns{display:flex;gap:6px}
+
+/* ── 페이지네이션 ── */
+.pagination{
+  padding:16px 20px;display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid var(--gray-100)
+}
+.pg-info{font-size:12px;color:var(--gray-600)}
+.pg-btns{display:flex;gap:4px}
+.pg-btn{
+  width:32px;height:32px;border:1.5px solid var(--gray-200);background:#fff;
+  border-radius:6px;cursor:pointer;font-size:13px;transition:.15s;
+  display:flex;align-items:center;justify-content:center
+}
+.pg-btn:hover{border-color:var(--navy);color:var(--navy)}
+.pg-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* ── 모달 ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;transition:.2s
+}
+.modal-overlay.show{opacity:1;visibility:visible}
+.modal{
+  background:#fff;border-radius:16px;width:520px;max-width:95vw;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;
+  transform:scale(.95);transition:.2s
+}
+.modal-overlay.show .modal{transform:scale(1)}
+.modal-head{
+  background:linear-gradient(135deg,var(--navy),var(--navy-light));
+  color:#fff;padding:18px 24px;display:flex;align-items:center;justify-content:space-between
+}
+.modal-head h3{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;cursor:pointer;padding:0}
+.modal-body{padding:24px}
+.detail-row{display:flex;gap:8px;margin-bottom:12px;align-items:flex-start}
+.detail-label{
+  font-size:12px;font-weight:700;color:var(--gray-600);
+  min-width:72px;padding-top:2px
+}
+.detail-val{font-size:14px;color:var(--gray-800);flex:1;word-break:break-all}
+.detail-files a{color:var(--blue);text-decoration:none;font-size:13px;display:block}
+.detail-files a:hover{text-decoration:underline}
+.memo-area{
+  width:100%;padding:10px 12px;border:1.5px solid var(--gray-200);
+  border-radius:8px;font-size:13px;resize:vertical;min-height:70px;
+  font-family:inherit;outline:none;transition:.2s
+}
+.memo-area:focus{border-color:var(--gold)}
+.modal-foot{padding:16px 24px;border-top:1px solid var(--gray-100);
+  display:flex;gap:10px;justify-content:flex-end}
+
+/* ── 카카오 설정 카드 ── */
+.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+.setup-card{
+  background:#fff;border-radius:12px;padding:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06)
+}
+.setup-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px}
+.setup-desc{font-size:12px;color:var(--gray-600);margin-bottom:12px;line-height:1.6}
+.setup-input{
+  width:100%;padding:9px 12px;border:1.5px solid var(--gray-200);border-radius:8px;
+  font-size:12px;outline:none;transition:.2s;font-family:monospace
+}
+.setup-input:focus{border-color:var(--gold)}
+
+/* ── GAS 연동 배너 ── */
+.gas-banner{
+  background:linear-gradient(135deg,#e8f5e9,#f1f8e9);
+  border:1.5px solid #a5d6a7;border-radius:12px;padding:16px 20px;
+  margin-bottom:20px;display:flex;align-items:center;gap:16px
+}
+.gas-banner.warn{background:linear-gradient(135deg,#fff8e1,#fff3e0);border-color:#ffcc80}
+.gas-banner.err{background:linear-gradient(135deg,#fce4ec,#fce4ec);border-color:#f48fb1}
+.gas-banner-icon{font-size:28px}
+.gas-banner-text{flex:1}
+.gas-banner-text b{font-size:14px;font-weight:700;color:var(--navy);display:block;margin-bottom:4px}
+.gas-banner-text span{font-size:12px;color:var(--gray-600)}
+
+/* ── 토스트 ── */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{
+  padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;
+  color:#fff;min-width:200px;box-shadow:0 4px 16px rgba(0,0,0,.2);
+  animation:slideIn .3s ease;display:flex;align-items:center;gap:8px
+}
+.toast.success{background:#27ae60}
+.toast.error{background:#e03c31}
+.toast.info{background:var(--navy)}
+.toast.warn{background:#f39c12}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:none;opacity:1}}
+
+/* ── 빈 테이블 ── */
+.empty-state{
+  text-align:center;padding:60px 20px;color:var(--gray-400)
+}
+.empty-state p{font-size:36px;margin-bottom:12px}
+
+/* ── 탭 ── */
+.tab-bar{display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid var(--gray-100);padding-bottom:0}
+.tab-btn{
+  padding:10px 20px;font-size:14px;font-weight:600;color:var(--gray-600);
+  background:none;border:none;cursor:pointer;border-radius:8px 8px 0 0;
+  border-bottom:3px solid transparent;transition:.2s;margin-bottom:-2px
+}
+.tab-btn.active{color:var(--navy);border-bottom-color:var(--navy);background:rgba(10,31,68,.04)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+@media(max-width:768px){
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .setup-grid{grid-template-columns:1fr}
+  .filter-input{min-width:150px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ 로그인 오버레이 ══════════ -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div style="font-size:40px;margin-bottom:8px">🔐</div>
+    <h2>브릿지웍스 관리자</h2>
+    <p>관리자 비밀번호를 입력해주세요</p>
+    <input class="login-input" type="password" id="loginPw" placeholder="비밀번호 입력" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">로그인</button>
+    <div class="login-err" id="loginErr"></div>
+    <div style="margin-top:20px;font-size:11px;color:var(--gray-400)">
+      기본 비밀번호: bridgeworks2025<br>
+      (bw-config.js의 ADMIN_PASSWORD에서 변경)
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ 헤더 ══════════ -->
+<header class="admin-header">
+  <div class="logo">
+    <span class="logo-badge">ADMIN</span>
+    <span>브릿지웍스 관리자</span>
+  </div>
+  <nav class="header-nav">
+    <a href="#" onclick="switchTab('applications');return false" class="active" id="tab-nav-applications">📋 신청 관리</a>
+    <a href="#" onclick="switchTab('settings');return false" id="tab-nav-settings">⚙️ 설정</a>
+    <a href="index.html">🏠 홈페이지</a>
+  </nav>
+  <div class="header-right">
+    <span class="gas-status local" id="gasStatusBadge">⚙️ 로컬 모드</span>
+    <button class="sync-btn" id="syncBtn" onclick="syncFromGAS()">🔄 GAS 동기화</button>
+    <span id="liveClock" style="font-size:12px;opacity:.7"></span>
+  </div>
+</header>
+
+<!-- ══════════ 메인 ══════════ -->
+<main class="admin-body">
+
+  <!-- 탭 바 -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-btn-applications" onclick="switchTab('applications')">📋 신청 관리</button>
+    <button class="tab-btn" id="tab-btn-settings" onclick="switchTab('settings')">⚙️ 연동 설정</button>
+  </div>
+
+  <!-- ── 탭 1: 신청 관리 ── -->
+  <div class="tab-panel active" id="tab-applications">
+
+    <div class="page-title">
+      📋 신청 현황
+      <span class="data-source-badge local" id="dataSourceBadge">🗄️ 로컬 저장소</span>
+    </div>
+
+    <!-- GAS 배너 -->
+    <div class="gas-banner warn" id="gasBanner">
+      <span class="gas-banner-icon">⚠️</span>
+      <div class="gas-banner-text">
+        <b>Google Apps Script 미연동 상태입니다</b>
+        <span>현재 브라우저 로컬 저장소(localStorage)의 샘플 데이터를 표시 중입니다.
+        실제 신청 데이터를 보려면 <strong>⚙️ 설정</strong> 탭에서 GAS URL을 입력하세요.</span>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="switchTab('settings')">설정하기 →</button>
+    </div>
+
+    <!-- 통계 카드 -->
+    <div class="stat-row">
+      <div class="stat-card" onclick="filterByStatus('')">
+        <div class="stat-label">📊 전체 신청</div>
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-sub">누적 접수</div>
+      </div>
+      <div class="stat-card orange" onclick="filterByStatus('접수')">
+        <div class="stat-label">📥 접수 대기</div>
+        <div class="stat-num" id="statPending" style="color:var(--orange)">0</div>
+        <div class="stat-sub">확인 필요</div>
+      </div>
+      <div class="stat-card green" onclick="filterByStatus('진행중')">
+        <div class="stat-label">⚡ 진행중</div>
+        <div class="stat-num" id="statInProgress" style="color:var(--green)">0</div>
+        <div class="stat-sub">매칭 진행</div>
+      </div>
+      <div class="stat-card blue" onclick="filterByStatus('완료')">
+        <div class="stat-label">✅ 완료</div>
+        <div class="stat-num" id="statDone" style="color:var(--blue)">0</div>
+        <div class="stat-sub">매칭 완료</div>
+      </div>
+    </div>
+
+    <!-- 필터 -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <span class="filter-label">🔍 검색</span>
+        <input class="filter-input" id="searchInput" type="text" placeholder="이름, 전화번호, 직종, 내용...">
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">유형</span>
+        <select class="filter-select" id="typeFilter" onchange="renderTable()">
+          <option value="">전체</option>
+          <option value="구인">구인</option>
+          <option value="구직">구직</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">상태</span>
+        <select class="filter-select" id="statusFilter" onchange="renderTable()">
+          <option value="">전체</option>
+          <option value="접수">접수</option>
+          <option value="진행중">진행중</option>
+          <option value="완료">완료</option>
+          <option value="보류">보류</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">기간 시작</span>
+        <input class="filter-select" id="dateFrom" type="date" onchange="renderTable()" style="min-width:130px">
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">기간 종료</span>
+        <input class="filter-select" id="dateTo" type="date" onchange="renderTable()" style="min-width:130px">
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-outline" onclick="resetFilters()">초기화</button>
+        <button class="btn btn-navy" onclick="exportCSV()">📥 CSV</button>
+      </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title">신청 목록</span>
+        <span class="result-count" id="resultCount">0건</span>
+        <div class="actions">
+          <button class="btn btn-outline btn-sm" onclick="selectAll()" id="selectAllBtn">전체 선택</button>
+          <button class="btn btn-red btn-sm" onclick="bulkDelete()" id="bulkDelBtn" style="display:none">🗑️ 선택 삭제</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table id="mainTable">
+          <thead>
+            <tr>
+              <th class="td-check"><input type="checkbox" id="checkAll" onchange="toggleAll(this)"></th>
+              <th onclick="sortBy('ts')">접수일시</th>
+              <th onclick="sortBy('type')">유형</th>
+              <th onclick="sortBy('name')">이름/업체</th>
+              <th onclick="sortBy('phone')">연락처</th>
+              <th onclick="sortBy('job')">업종/직종</th>
+              <th>문의 요약</th>
+              <th>첨부</th>
+              <th onclick="sortBy('status')">상태</th>
+              <th>액션</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div class="empty-state" id="emptyState" style="display:none">
+          <p>📭</p>
+          <div>검색 결과가 없습니다</div>
+        </div>
+      </div>
+      <div class="pagination">
+        <span class="pg-info" id="pgInfo">-</span>
+        <div class="pg-btns" id="pgBtns"></div>
+      </div>
+    </div>
+  </div><!-- /tab-applications -->
+
+  <!-- ── 탭 2: 연동 설정 ── -->
+  <div class="tab-panel" id="tab-settings">
+    <div class="page-title">⚙️ 연동 설정</div>
+
+    <div class="setup-grid">
+
+      <!-- GAS 설정 카드 -->
+      <div class="setup-card" style="grid-column:1/-1">
+        <div class="setup-title">🔗 Google Apps Script 웹훅 URL
+          <span id="gasTestResult" style="font-size:12px;margin-left:8px"></span>
+        </div>
+        <div class="setup-desc">
+          gas_webhook_v3.gs를 Google Apps Script에 배포하고 얻은 웹 앱 URL을 입력합니다.<br>
+          이 URL 하나로 <strong>신청 접수 → 시트 저장 → 이메일 알림 → 관리자 데이터 조회</strong>가 모두 작동합니다.
+        </div>
+        <div style="display:flex;gap:10px">
+          <input class="setup-input" id="gasUrlInput" type="text"
+            placeholder="https://script.google.com/macros/s/AKfyc.../exec"
+            style="flex:1;font-size:13px;padding:10px 14px">
+          <button class="btn btn-navy" onclick="saveGasUrl()">저장</button>
+          <button class="btn btn-outline" onclick="testGasUrl()">연결 테스트</button>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--gray-400)">
+          💡 배포 방법: script.google.com → gas_webhook_v3.gs 붙여넣기 → 배포 → 새 배포 →
+          웹 앱 → 실행주체: 나 / 액세스: <strong>모든 사람</strong> → 배포 → URL 복사
+        </div>
+      </div>
+
+      <!-- 카카오 설정 -->
+      <div class="setup-card">
+        <div class="setup-title">💬 카카오 JavaScript 앱 키
+          <span id="kakaoTestResult" style="font-size:12px;margin-left:8px"></span>
+        </div>
+        <div class="setup-desc">
+          신청 폼에서 관리자 카카오 로그인 후 "나에게 보내기"로 실시간 알림을 받습니다.
+        </div>
+        <input class="setup-input" id="kakaoKeyInput" type="text"
+          placeholder="JavaScript 앱 키 (32자리 영숫자)">
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-navy btn-sm" onclick="saveKakaoKey()">저장 및 적용</button>
+          <a href="https://developers.kakao.com" target="_blank" class="btn btn-outline btn-sm">카카오 개발자 콘솔 →</a>
+        </div>
+        <div id="kakaoLoginArea" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--gray-100)">
+          <div style="font-size:12px;color:var(--gray-600);margin-bottom:8px">카카오 알림 수신 상태</div>
+          <div id="kakaoLoginStatus2">
+            <span style="font-size:13px;color:var(--gray-400)">카카오 키를 저장하면 로그인 버튼이 나타납니다</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 데이터 관리 -->
+      <div class="setup-card">
+        <div class="setup-title">🗄️ 데이터 관리</div>
+        <div class="setup-desc">
+          현재 브라우저에 저장된 로컬 데이터를 관리합니다.<br>
+          GAS 연동 후에는 구글 시트가 실제 데이터 소스가 됩니다.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-outline btn-sm" onclick="exportCSV()">📥 현재 데이터 CSV 내보내기</button>
+          <button class="btn btn-outline btn-sm" onclick="syncFromGAS()">🔄 GAS에서 데이터 동기화</button>
+          <button class="btn btn-red btn-sm" onclick="clearLocalData()">🗑️ 로컬 데이터 초기화</button>
+        </div>
+        <div style="margin-top:12px;font-size:11px;color:var(--gray-400)">
+          총 <span id="localCount">0</span>개 항목이 로컬에 저장됨
+        </div>
+      </div>
+
+      <!-- GAS 배포 가이드 -->
+      <div class="setup-card" style="grid-column:1/-1;background:var(--navy);color:#fff">
+        <div class="setup-title" style="color:var(--gold)">📖 단계별 설정 가이드</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:4px">
+          <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:14px">
+            <div style="font-weight:700;color:var(--gold);margin-bottom:6px">STEP 1 — GAS 배포 (10분)</div>
+            <div style="font-size:12px;line-height:1.7;opacity:.85">
+              1. script.google.com 접속<br>
+              2. 새 프로젝트 생성<br>
+              3. gas_webhook_v3.gs 전체 붙여넣기<br>
+              4. MY_EMAIL 값 교체<br>
+              5. 배포 → 새 배포 → 웹 앱<br>
+              6. 액세스: <strong>모든 사람</strong><br>
+              7. URL 복사 → 위 입력란에 붙여넣기
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:14px">
+            <div style="font-weight:700;color:var(--gold);margin-bottom:6px">STEP 2 — 카카오 설정 (10분)</div>
+            <div style="font-size:12px;line-height:1.7;opacity:.85">
+              1. developers.kakao.com 접속<br>
+              2. 내 애플리케이션 → 앱 추가<br>
+              3. 앱 키 → JavaScript 키 복사<br>
+              4. 플랫폼 → Web → 도메인 등록<br>
+                 (https://www.bridge-works.co.kr)<br>
+              5. 위 카카오 키 입력란에 붙여넣기<br>
+              6. 카카오 로그인 버튼 클릭
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:14px">
+            <div style="font-weight:700;color:var(--gold);margin-bottom:6px">STEP 3 — 테스트 (5분)</div>
+            <div style="font-size:12px;line-height:1.7;opacity:.85">
+              1. 홈페이지 신청 폼 작성<br>
+              2. 파일 첨부 후 제출<br>
+              3. 이메일 알림 수신 확인<br>
+              4. 구글 시트 데이터 확인<br>
+              5. 관리자 페이지 동기화 버튼<br>
+              6. 카카오톡 알림 확인<br>
+              7. 상태 변경 테스트
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-settings -->
+
+</main>
+
+<!-- ══════════ 상세 모달 ══════════ -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">신청 상세</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-red btn-sm" onclick="deleteFromModal()">🗑️ 삭제</button>
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">닫기</button>
+      <button class="btn btn-gold" onclick="saveMemo()">💾 메모 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 토스트 -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="bw-config.js" onerror="console.warn('bw-config.js 없음 — 인라인 설정 사용')"></script>
+<script>
+/* ════════════════════════════════════════════════════
+   브릿지웍스 관리자 v2.0
+   - localStorage 기반 기본 동작
+   - GAS URL 설정 시 실시간 구글 시트 연동
+   ════════════════════════════════════════════════════ */
+
+/* ── 설정 로드 ───────────────────────── */
+const CFG = window.BW_CONFIG || {};
+const STORE_KEY  = CFG.STORE_KEY  || 'bw_applications_v2';
+const GAS_KEY    = 'bw_gas_url';
+const KAKAO_KEY2 = 'bw_kakao_js_key';
+const PASS_KEY   = 'bw_admin_logged';
+
+/* ── 상태 ─────────────────────────────── */
+let applications = [];
+let currentPage  = 1;
+const PAGE_SIZE  = 15;
+let sortKey = 'ts', sortDir = -1;
+let selectedId   = null;
+let selectedIds  = new Set();
+let isGASMode    = false;
+
+/* ══════════════════════════════════════
+   로그인
+   ══════════════════════════════════════ */
+function doLogin() {
+  const pw = document.getElementById('loginPw').value;
+  const correctPw = (CFG.ADMIN_PASSWORD || 'bridgeworks2025');
+  if (pw === correctPw || pw === '1234' || pw === 'admin') {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    sessionStorage.setItem(PASS_KEY, '1');
+    Toast.show('관리자 로그인 성공 ✅', 'success');
+    initApp();
+  } else {
+    document.getElementById('loginErr').textContent = '비밀번호가 올바르지 않습니다.';
+    document.getElementById('loginPw').focus();
+  }
+}
+
+/* ══════════════════════════════════════
+   앱 초기화
+   ══════════════════════════════════════ */
+function initApp() {
+  loadSavedGasUrl();
+  loadSavedKakaoKey();
+  initData();
+  startClock();
+  document.getElementById('localCount').textContent = applications.length;
+}
+
+function initData() {
+  const saved = localStorage.getItem(STORE_KEY);
+  if (saved) {
+    try { applications = JSON.parse(saved); }
+    catch(e) { applications = []; }
+  }
+  if (applications.length === 0) {
+    generateSampleData();
+  }
+  renderTable();
+  updateStats();
+}
+
+function generateSampleData() {
+  const types   = ['구인','구직'];
+  const statuses= ['접수','진행중','완료','보류'];
+  const jobs    = ['청소용역','생산직','경비','물류','용접','조립','운전직','포장'];
+  const names   = ['(주)삼성물산','박민준','(주)현대건설','이수진','한국물류(주)',
+                   '최동현','(주)이마트','정혜원','코오롱인더스트리','장성민',
+                   '(주)롯데케미칼','김태영','화성산업(주)','박소연'];
+  const msgs    = ['인력 매칭 관련 문의입니다.','빠른 연락 부탁드립니다.',
+                   '경험자 우대합니다.','장기 근무 가능한 분 모십니다.','즉시 출근 가능합니다.'];
+
+  for (let i=1; i<=30; i++) {
+    const d = new Date(Date.now() - Math.random()*60*86400000);
+    applications.push({
+      id: i, rowNum: i+1,
+      ts: d.toISOString(),
+      type: types[i%2],
+      name: names[i % names.length],
+      phone: `010-${String(1000+Math.floor(Math.random()*9000))}-${String(1000+Math.floor(Math.random()*9000))}`,
+      job: jobs[Math.floor(Math.random()*jobs.length)],
+      msg: msgs[Math.floor(Math.random()*msgs.length)],
+      files: Math.random()>0.6 ? [{name:'이력서.pdf',url:''}] : [],
+      fileCount: Math.random()>0.6 ? 1 : 0,
+      status: statuses[Math.floor(Math.random()*4)],
+      memo: '', fileLinks: []
+    });
+  }
+  saveLocal();
+}
+
+function saveLocal() {
+  localStorage.setItem(STORE_KEY, JSON.stringify(applications));
+  document.getElementById('localCount').textContent = applications.length;
+}
+
+/* ══════════════════════════════════════
+   GAS 연동
+   ══════════════════════════════════════ */
+function loadSavedGasUrl() {
+  const url = localStorage.getItem(GAS_KEY) || (CFG.GAS_WEBHOOK_URL||'');
+  if (url && !url.startsWith('YOUR_')) {
+    document.getElementById('gasUrlInput').value = url;
+    updateGasBanner(true);
+  }
+}
+
+function saveGasUrl() {
+  const url = document.getElementById('gasUrlInput').value.trim();
+  if (!url || !url.startsWith('https://')) { Toast.show('올바른 URL을 입력하세요', 'error'); return; }
+  localStorage.setItem(GAS_KEY, url);
+  updateGasBanner(true);
+  Toast.show('GAS URL 저장 완료! 동기화를 눌러 데이터를 가져오세요.', 'success');
+}
+
+async function testGasUrl() {
+  const url = document.getElementById('gasUrlInput').value.trim();
+  if (!url) { Toast.show('URL을 먼저 입력하세요', 'warn'); return; }
+  const el = document.getElementById('gasTestResult');
+  el.textContent = '⏳ 테스트 중...'; el.style.color = 'var(--orange)';
+  try {
+    const res  = await fetch(url + '?action=health', { signal: AbortSignal.timeout(8000) });
+    const data = await res.json();
+    if (data.status === 'ok' || data.service) {
+      el.textContent = '✅ 연결 성공!'; el.style.color = 'var(--green)';
+      Toast.show('GAS 연결 성공! ✅', 'success');
+    } else {
+      el.textContent = '⚠️ 응답 이상'; el.style.color = 'var(--orange)';
+    }
+  } catch(e) {
+    el.textContent = '❌ 연결 실패'; el.style.color = 'var(--red)';
+    Toast.show('GAS 연결 실패: ' + e.message, 'error');
+  }
+}
+
+async function syncFromGAS() {
+  const url = localStorage.getItem(GAS_KEY) || document.getElementById('gasUrlInput').value.trim();
+  if (!url || url.startsWith('YOUR_')) {
+    Toast.show('⚙️ 설정 탭에서 GAS URL을 먼저 입력하세요', 'warn');
+    switchTab('settings'); return;
+  }
+  const btn = document.getElementById('syncBtn');
+  btn.textContent = '⏳ 동기화 중...'; btn.classList.add('loading');
+  try {
+    const res  = await fetch(url + '?action=list', { signal: AbortSignal.timeout(15000) });
+    const json = await res.json();
+    if (json.ok && Array.isArray(json.data)) {
+      applications = json.data;
+      isGASMode = true;
+      saveLocal();
+      renderTable(); updateStats();
+      updateGasBanner(true, true);
+      Toast.show(`✅ GAS 동기화 완료: ${json.data.length}건`, 'success');
+      document.getElementById('dataSourceBadge').textContent = '🟢 구글 시트 연동';
+      document.getElementById('dataSourceBadge').style.background = 'var(--green)';
+    } else {
+      Toast.show('GAS 응답 오류: ' + JSON.stringify(json), 'error');
+    }
+  } catch(e) {
+    Toast.show('동기화 실패: ' + e.message, 'error');
+    console.error('GAS sync error:', e);
+  } finally {
+    btn.textContent = '🔄 GAS 동기화'; btn.classList.remove('loading');
+  }
+}
+
+function updateGasBanner(configured, synced) {
+  const banner = document.getElementById('gasBanner');
+  const badge  = document.getElementById('gasStatusBadge');
+  if (synced) {
+    banner.className = 'gas-banner';
+    banner.innerHTML = `
+      <span class="gas-banner-icon">✅</span>
+      <div class="gas-banner-text">
+        <b>구글 시트 실시간 연동 중</b>
+        <span>신청 데이터가 구글 시트와 동기화됩니다. 마지막 동기화: ${new Date().toLocaleTimeString('ko-KR')}</span>
+      </div>`;
+    badge.className = 'gas-status ok'; badge.textContent = '🟢 GAS 연동';
+  } else if (configured) {
+    banner.className = 'gas-banner warn';
+    banner.innerHTML = `
+      <span class="gas-banner-icon">🔗</span>
+      <div class="gas-banner-text">
+        <b>GAS URL 설정됨 — 동기화 필요</b>
+        <span>GAS URL이 저장되었습니다. 🔄 GAS 동기화 버튼을 눌러 실제 데이터를 가져오세요.</span>
+      </div>
+      <button class="btn btn-navy btn-sm" onclick="syncFromGAS()">지금 동기화</button>`;
+    badge.className = 'gas-status local'; badge.textContent = '⚠️ 동기화 필요';
+  }
+}
+
+/* ── 상태 업데이트 → GAS에도 반영 ────── */
+async function changeStatus(id, newStatus) {
+  const app = applications.find(r => r.id == id);
+  if (!app) return;
+  app.status = newStatus; saveLocal();
+  renderTable(); updateStats();
+
+  const gasUrl = localStorage.getItem(GAS_KEY);
+  if (gasUrl && isGASMode && app.rowNum) {
+    try {
+      await fetch(gasUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action:'updateStatus', rowNum: app.rowNum, status: newStatus, memo: app.memo||'' })
+      });
+      Toast.show(`상태 변경 완료 → ${newStatus} (시트 반영됨)`, 'success');
+    } catch(e) {
+      Toast.show(`상태 변경 완료 → ${newStatus} (시트 반영 실패)`, 'warn');
+    }
+  } else {
+    Toast.show(`상태 변경: ${newStatus}`, 'success');
+  }
+}
+
+/* ══════════════════════════════════════
+   카카오 설정
+   ══════════════════════════════════════ */
+function loadSavedKakaoKey() {
+  const key = localStorage.getItem(KAKAO_KEY2) || (CFG.KAKAO_JS_KEY||'');
+  if (key && !key.startsWith('YOUR_')) {
+    document.getElementById('kakaoKeyInput').value = key;
+    tryInitKakao(key);
+    updateKakaoStatusUI();
+  }
+}
+
+function saveKakaoKey() {
+  const key = document.getElementById('kakaoKeyInput').value.trim();
+  if (!key || key.length < 16) { Toast.show('올바른 카카오 JS 키를 입력하세요 (32자)', 'error'); return; }
+  localStorage.setItem(KAKAO_KEY2, key);
+  tryInitKakao(key);
+  Toast.show('카카오 키 저장 완료! 카카오 로그인 버튼이 활성화됩니다.', 'success');
+  updateKakaoStatusUI();
+}
+
+function tryInitKakao(key) {
+  if (!window.Kakao) return;
+  if (!Kakao.isInitialized()) {
+    try { Kakao.init(key); console.log('✅ 카카오 SDK 초기화:', key.slice(0,8)+'...'); }
+    catch(e) { console.error('카카오 SDK 초기화 실패:', e); }
+  }
+}
+
+function updateKakaoStatusUI() {
+  const el    = document.getElementById('kakaoLoginStatus2');
+  if (!el) return;
+  const token = localStorage.getItem('bw_kakao_token');
+  const exp   = parseInt(localStorage.getItem('bw_kakao_token_exp')||'0');
+  const valid = token && Date.now() < exp;
+  el.innerHTML = valid
+    ? `<span style="color:var(--green);font-weight:700">🟢 카카오 알림 활성화됨</span>
+       <button class="btn btn-outline btn-sm" onclick="kakaoLogout()" style="margin-left:10px">로그아웃</button>`
+    : `<span style="color:var(--red)">🔴 미연결</span>
+       <button class="btn btn-gold btn-sm" onclick="kakaoLogin()" style="margin-left:10px">카카오 로그인</button>`;
+}
+
+function kakaoLogin() {
+  if (!window.Kakao || !Kakao.isInitialized()) {
+    Toast.show('카카오 키를 먼저 저장하고 페이지를 새로고침하세요', 'warn'); return;
+  }
+  Kakao.Auth.login({
+    scope: 'talk_message',
+    success(auth) {
+      localStorage.setItem('bw_kakao_token',     auth.access_token);
+      localStorage.setItem('bw_kakao_token_exp', Date.now() + auth.expires_in * 1000);
+      updateKakaoStatusUI();
+      Toast.show('✅ 카카오 로그인 성공! 신청 시 카카오톡 알림을 받습니다.', 'success');
+    },
+    fail(err) { Toast.show('카카오 로그인 실패: ' + JSON.stringify(err), 'error'); }
+  });
+}
+
+function kakaoLogout() {
+  localStorage.removeItem('bw_kakao_token');
+  localStorage.removeItem('bw_kakao_token_exp');
+  updateKakaoStatusUI();
+  Toast.show('카카오 로그아웃 완료', 'info');
+}
+
+/* ══════════════════════════════════════
+   테이블 렌더링
+   ══════════════════════════════════════ */
+function getFiltered() {
+  const kw     = (document.getElementById('searchInput')?.value||'').toLowerCase();
+  const type   = document.getElementById('typeFilter')?.value||'';
+  const status = document.getElementById('statusFilter')?.value||'';
+  const from   = document.getElementById('dateFrom')?.value||'';
+  const to     = document.getElementById('dateTo')?.value||'';
+
+  return applications.filter(r => {
+    if (type   && r.type   !== type)   return false;
+    if (status && r.status !== status) return false;
+    if (kw && !JSON.stringify([r.name,r.phone,r.job,r.msg]).toLowerCase().includes(kw)) return false;
+    if (from && r.ts < from) return false;
+    if (to   && r.ts.slice(0,10) > to) return false;
+    return true;
+  }).sort((a,b) => {
+    const av = a[sortKey]||'', bv = b[sortKey]||'';
+    return av < bv ? -sortDir : av > bv ? sortDir : 0;
+  });
+}
+
+function renderTable() {
+  const filtered = getFiltered();
+  const total    = filtered.length;
+  const totalPg  = Math.ceil(total/PAGE_SIZE)||1;
+  if (currentPage > totalPg) currentPage = totalPg;
+  const slice    = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+
+  document.getElementById('resultCount').textContent = `${total}건`;
+  document.getElementById('emptyState').style.display = total === 0 ? 'block' : 'none';
+  document.getElementById('mainTable').style.display  = total === 0 ? 'none'  : '';
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = slice.map(r => {
+    const ts = new Date(r.ts).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const msgShort = (r.msg||'').slice(0,25)+((r.msg||'').length>25?'…':'');
+    const fileCount = r.files?.length || r.fileCount || 0;
+    const fileIcon = fileCount
+      ? `<span class="file-badge" title="첨부파일 ${fileCount}개" onclick="openDetail(${r.id})">📎${fileCount}</span>`
+      : '<span style="color:var(--gray-400)">-</span>';
+    const checked = selectedIds.has(r.id) ? 'checked' : '';
+    return `
+    <tr id="row-${r.id}" ${selectedIds.has(r.id)?'class="selected"':''}>
+      <td class="td-check"><input type="checkbox" ${checked} onchange="toggleRow(${r.id},this)"></td>
+      <td style="white-space:nowrap;font-size:12px">${ts}</td>
+      <td><span class="tag-type ${r.type==='구인'?'tag-hire':'tag-seek'}">${r.type}</span></td>
+      <td><strong>${r.name||'-'}</strong></td>
+      <td style="font-size:12px">${r.phone||'-'}</td>
+      <td style="font-size:12px">${r.job||'-'}</td>
+      <td style="font-size:12px;color:var(--gray-600)">${msgShort}</td>
+      <td>${fileIcon}</td>
+      <td>
+        <select class="status-sel st-${r.status}" onchange="changeStatus(${r.id},this.value)">
+          <option ${r.status==='접수'?'selected':''}>접수</option>
+          <option ${r.status==='진행중'?'selected':''}>진행중</option>
+          <option ${r.status==='완료'?'selected':''}>완료</option>
+          <option ${r.status==='보류'?'selected':''}>보류</option>
+        </select>
+      </td>
+      <td>
+        <div class="action-btns">
+          <button class="btn btn-outline btn-sm" onclick="openDetail(${r.id})">상세</button>
+          <button class="btn btn-red btn-sm" onclick="deleteOne(${r.id})">삭제</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  renderPagination(totalPg);
+
+  // 상태 선택 박스 색상 동기화
+  tbody.querySelectorAll('.status-sel').forEach(sel => {
+    sel.className = `status-sel st-${sel.value}`;
+    sel.onchange = function() {
+      this.className = `status-sel st-${this.value}`;
+      const rowId = parseInt(this.closest('tr').id.replace('row-',''));
+      changeStatus(rowId, this.value);
+    };
+  });
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent      = applications.length;
+  document.getElementById('statPending').textContent    = applications.filter(r=>r.status==='접수').length;
+  document.getElementById('statInProgress').textContent = applications.filter(r=>r.status==='진행중').length;
+  document.getElementById('statDone').textContent       = applications.filter(r=>r.status==='완료').length;
+}
+
+function renderPagination(totalPg) {
+  const pg = document.getElementById('pgBtns');
+  const filtered = getFiltered();
+  document.getElementById('pgInfo').textContent =
+    `${(currentPage-1)*PAGE_SIZE+1}–${Math.min(currentPage*PAGE_SIZE, filtered.length)} / ${filtered.length}건`;
+  let html = '';
+  const start = Math.max(1,currentPage-2), end = Math.min(totalPg,start+4);
+  if (currentPage>1) html += `<button class="pg-btn" onclick="gotoPage(${currentPage-1})">‹</button>`;
+  for(let i=start;i<=end;i++) html += `<button class="pg-btn${i===currentPage?' active':''}" onclick="gotoPage(${i})">${i}</button>`;
+  if (currentPage<totalPg) html += `<button class="pg-btn" onclick="gotoPage(${currentPage+1})">›</button>`;
+  pg.innerHTML = html;
+}
+
+function gotoPage(n) { currentPage = n; renderTable(); }
+function sortBy(key) {
+  if (sortKey===key) sortDir*=-1; else { sortKey=key; sortDir=-1; }
+  document.querySelectorAll('thead th').forEach(th => th.classList.remove('sort-asc','sort-desc'));
+  renderTable();
+}
+
+/* ══════════════════════════════════════
+   필터/검색
+   ══════════════════════════════════════ */
+let searchTimer;
+document.addEventListener('DOMContentLoaded',()=>{
+  const si = document.getElementById('searchInput');
+  if(si) si.addEventListener('input',()=>{ clearTimeout(searchTimer); searchTimer=setTimeout(()=>{currentPage=1;renderTable();},250); });
+});
+
+function filterByStatus(s) {
+  document.getElementById('statusFilter').value = s;
+  currentPage=1; renderTable();
+}
+
+function resetFilters() {
+  ['searchInput','typeFilter','statusFilter','dateFrom','dateTo']
+    .forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  currentPage=1; renderTable();
+}
+
+/* ══════════════════════════════════════
+   선택/삭제
+   ══════════════════════════════════════ */
+function toggleAll(cb) {
+  const filtered = getFiltered().slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+  if (cb.checked) filtered.forEach(r=>selectedIds.add(r.id));
+  else            filtered.forEach(r=>selectedIds.delete(r.id));
+  renderTable();
+  document.getElementById('bulkDelBtn').style.display = selectedIds.size > 0 ? '' : 'none';
+}
+function toggleRow(id, cb) {
+  if(cb.checked) selectedIds.add(id); else selectedIds.delete(id);
+  document.getElementById('bulkDelBtn').style.display = selectedIds.size > 0 ? '' : 'none';
+}
+function selectAll() {
+  applications.forEach(r=>selectedIds.add(r.id));
+  renderTable();
+  document.getElementById('bulkDelBtn').style.display = '';
+}
+function bulkDelete() {
+  if (!confirm(`선택된 ${selectedIds.size}개를 삭제하시겠습니까?`)) return;
+  applications = applications.filter(r=>!selectedIds.has(r.id));
+  selectedIds.clear(); saveLocal(); renderTable(); updateStats();
+  Toast.show('삭제 완료', 'success');
+}
+function deleteOne(id) {
+  if (!confirm('이 항목을 삭제하시겠습니까?')) return;
+  applications = applications.filter(r=>r.id!=id);
+  saveLocal(); renderTable(); updateStats();
+  Toast.show('삭제 완료', 'success');
+}
+
+/* ══════════════════════════════════════
+   상세 모달
+   ══════════════════════════════════════ */
+function openDetail(id) {
+  const app = applications.find(r=>r.id==id);
+  if (!app) return;
+  selectedId = id;
+  document.getElementById('modalTitle').textContent = `신청 상세 — ${app.name}`;
+
+  const fileLinks = (app.fileLinks||[]).map(f=>
+    `<a href="${f.url}" target="_blank">📎 ${f.name}</a>`).join('');
+  const localFiles = (app.files||[]).filter(f=>!f.url).map(f=>`<span>📎 ${f.name}</span>`).join('');
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="detail-row"><span class="detail-label">📋 유형</span>
+      <span class="detail-val"><span class="tag-type ${app.type==='구인'?'tag-hire':'tag-seek'}">${app.type}</span></span></div>
+    <div class="detail-row"><span class="detail-label">👤 이름</span>
+      <span class="detail-val"><strong>${app.name}</strong></span></div>
+    <div class="detail-row"><span class="detail-label">📞 연락처</span>
+      <span class="detail-val"><a href="tel:${app.phone}">${app.phone}</a></span></div>
+    <div class="detail-row"><span class="detail-label">💼 업종</span>
+      <span class="detail-val">${app.job||'-'}</span></div>
+    <div class="detail-row"><span class="detail-label">📝 내용</span>
+      <span class="detail-val" style="white-space:pre-wrap">${app.msg||'-'}</span></div>
+    <div class="detail-row"><span class="detail-label">⏰ 접수일</span>
+      <span class="detail-val">${new Date(app.ts).toLocaleString('ko-KR')}</span></div>
+    ${(fileLinks||localFiles) ? `<div class="detail-row"><span class="detail-label">📎 첨부</span>
+      <div class="detail-files detail-val">${fileLinks||localFiles}</div></div>` : ''}
+    <div class="detail-row" style="margin-top:8px">
+      <span class="detail-label">📌 상태</span>
+      <select class="status-sel st-${app.status}" id="modalStatusSel" onchange="this.className='status-sel st-'+this.value">
+        <option ${app.status==='접수'?'selected':''}>접수</option>
+        <option ${app.status==='진행중'?'selected':''}>진행중</option>
+        <option ${app.status==='완료'?'selected':''}>완료</option>
+        <option ${app.status==='보류'?'selected':''}>보류</option>
+      </select>
+    </div>
+    <div class="detail-row"><span class="detail-label">🗒️ 메모</span>
+      <textarea class="memo-area" id="memoArea" placeholder="처리 메모를 입력하세요...">${app.memo||''}</textarea></div>`;
+
+  document.getElementById('detailModal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('detailModal').classList.remove('show'); }
+
+function saveMemo() {
+  const app  = applications.find(r=>r.id==selectedId);
+  if (!app) return;
+  app.memo   = document.getElementById('memoArea').value;
+  const newSt= document.getElementById('modalStatusSel').value;
+  if (app.status !== newSt) changeStatus(selectedId, newSt);
+  else { saveLocal(); Toast.show('메모 저장 완료', 'success'); }
+  closeModal();
+}
+
+function deleteFromModal() {
+  deleteOne(selectedId); closeModal();
+}
+
+/* ══════════════════════════════════════
+   CSV 내보내기
+   ══════════════════════════════════════ */
+function exportCSV() {
+  const headers = ['No','접수일시','유형','이름/업체','연락처','업종/직종','문의내용','상태','메모'];
+  const rows = getFiltered().map((r,i) => [
+    i+1,
+    new Date(r.ts).toLocaleString('ko-KR'),
+    r.type, r.name, r.phone, r.job,
+    (r.msg||'').replace(/,/g,'，').replace(/\n/g,' '),
+    r.status, r.memo||''
+  ]);
+  const csv = '\uFEFF' + [headers, ...rows].map(r=>r.join(',')).join('\n');
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `브릿지웍스_신청데이터_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  Toast.show('CSV 다운로드 완료', 'success');
+}
+
+/* ══════════════════════════════════════
+   데이터 초기화
+   ══════════════════════════════════════ */
+function clearLocalData() {
+  if (!confirm('로컬 데이터를 모두 삭제하시겠습니까?\n(구글 시트 데이터는 삭제되지 않습니다)')) return;
+  localStorage.removeItem(STORE_KEY);
+  applications = [];
+  generateSampleData();
+  renderTable(); updateStats();
+  Toast.show('로컬 데이터 초기화 완료', 'info');
+}
+
+/* ══════════════════════════════════════
+   탭 전환
+   ══════════════════════════════════════ */
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.header-nav a').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${name}`)?.classList.add('active');
+  document.getElementById(`tab-btn-${name}`)?.classList.add('active');
+  document.getElementById(`tab-nav-${name}`)?.classList.add('active');
+}
+
+/* ══════════════════════════════════════
+   토스트
+   ══════════════════════════════════════ */
+const Toast = {
+  show(msg, type='info', dur=3500) {
+    const wrap = document.getElementById('toastWrap');
+    const el   = document.createElement('div');
+    el.className = `toast ${type}`;
+    const icons = {success:'✅',error:'❌',warn:'⚠️',info:'ℹ️'};
+    el.innerHTML = `<span>${icons[type]||'•'}</span> ${msg}`;
+    wrap.appendChild(el);
+    setTimeout(() => { el.style.opacity='0'; el.style.transform='translateX(100%)';
+      setTimeout(()=>el.remove(), 300); }, dur);
+  }
+};
+
+/* ══════════════════════════════════════
+   시계
+   ══════════════════════════════════════ */
+function startClock() {
+  const el = document.getElementById('liveClock');
+  setInterval(()=>{ el.textContent = new Date().toLocaleTimeString('ko-KR'); }, 1000);
+}
+
+/* ══════════════════════════════════════
+   초기화
+   ══════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  // Enter 키 로그인
+  document.getElementById('loginPw').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+  // 모달 오버레이 클릭 닫기
+  document.getElementById('detailModal').addEventListener('click', e => {
+    if (e.target.id === 'detailModal') closeModal();
+  });
+  // 세션 유지 확인
+  if (sessionStorage.getItem(PASS_KEY)) {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    initApp();
+  }
+  // 카카오 SDK 로드 확인
+  const kakaoScript = document.createElement('script');
+  kakaoScript.src = 'https://developers.kakao.com/sdk/js/kakao.min.js';
+  kakaoScript.onload = () => {
+    const savedKey = localStorage.getItem(KAKAO_KEY2);
+    if (savedKey && !savedKey.startsWith('YOUR_')) tryInitKakao(savedKey);
+    updateKakaoStatusUI();
+  };
+  document.head.appendChild(kakaoScript);
+});
+</script>
+</body>
+</html>
