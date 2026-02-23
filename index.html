@@ -1,0 +1,3422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>브릿지웍스 주식회사 - 통합 인력관리 플랫폼</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <!-- 카카오 SDK (지도 + 카카오톡) -->
+  <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+  <!-- 카카오 맵 JS API -->
+  <script type="text/javascript"
+    src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_MAP_APP_KEY&libraries=services"></script>
+  
+</head>
+<style>
+/* ── 인라인 메인 스타일 ── */
+/* ============================================
+   브릿지웍스 통합 플랫폼 - 메인 CSS
+   컬러: Navy #0a1f44 / Gold #c9a84c
+   ============================================ */
+
+:root {
+  --navy:       #0a1f44;
+  --navy-light: #162d5e;
+  --navy-dark:  #060f22;
+  --gold:       #c9a84c;
+  --gold-light: #e8c96a;
+  --gold-dark:  #a0832a;
+  --white:      #ffffff;
+  --gray-100:   #f4f6fb;
+  --gray-200:   #e8ecf4;
+  --gray-300:   #d0d7e8;
+  --gray-500:   #7a8aaa;
+  --gray-700:   #3a4a6a;
+  --red:        #e03c31;
+  --green:      #2ecc71;
+  --orange:     #f39c12;
+  --sidebar-w:  240px;
+  --header-h:   60px;
+  --radius:     8px;
+  --shadow:     0 2px 12px rgba(10,31,68,0.10);
+  --shadow-lg:  0 8px 32px rgba(10,31,68,0.18);
+  --transition: all 0.2s ease;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  background: var(--gray-100);
+  color: var(--navy);
+  line-height: 1.6;
+}
+a { text-decoration: none; color: inherit; }
+input, select, textarea, button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* ============ 스크롤바 ============ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--gray-200); }
+::-webkit-scrollbar-thumb { background: var(--navy-light); border-radius: 3px; }
+
+/* ============ 로그인 페이지 ============ */
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 50%, var(--navy-light) 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.login-box {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 48px 40px;
+  width: 400px;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+.login-logo {
+  margin-bottom: 8px;
+}
+.login-logo .logo-text {
+  font-size: 28px; font-weight: 800;
+  color: var(--navy);
+  letter-spacing: -0.5px;
+}
+.login-logo .logo-text span { color: var(--gold); }
+.login-subtitle {
+  color: var(--gray-500); font-size: 13px; margin-bottom: 32px;
+}
+.login-box h2 {
+  font-size: 18px; font-weight: 700;
+  color: var(--navy); margin-bottom: 24px;
+}
+.form-group { margin-bottom: 16px; text-align: left; }
+.form-group label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: var(--gray-700); margin-bottom: 6px;
+}
+.form-group input {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius);
+  font-size: 14px; color: var(--navy);
+  transition: var(--transition);
+  background: var(--white);
+}
+.form-group input:focus {
+  outline: none; border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+}
+.btn-login {
+  width: 100%; padding: 13px;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  color: var(--white); border: none; border-radius: var(--radius);
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: var(--transition); margin-top: 8px;
+  letter-spacing: 0.5px;
+}
+.btn-login:hover {
+  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 100%);
+  transform: translateY(-1px); box-shadow: var(--shadow);
+}
+.login-footer {
+  margin-top: 24px; font-size: 12px; color: var(--gray-500);
+}
+
+/* ============ 앱 레이아웃 ============ */
+.app-layout {
+  display: flex; min-height: 100vh;
+}
+
+/* ============ 사이드바 ============ */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--navy);
+  display: flex; flex-direction: column;
+  position: fixed; left: 0; top: 0; bottom: 0;
+  z-index: 100;
+  transition: var(--transition);
+}
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-logo {
+  font-size: 20px; font-weight: 800;
+  color: var(--white); letter-spacing: -0.5px;
+}
+.sidebar-logo span { color: var(--gold); }
+.sidebar-tagline {
+  font-size: 10px; color: rgba(255,255,255,0.45);
+  margin-top: 2px;
+}
+.sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+.nav-section-title {
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.35);
+  padding: 14px 20px 6px;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px;
+  color: rgba(255,255,255,0.65);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: var(--transition);
+  border-left: 3px solid transparent;
+  position: relative;
+}
+.nav-item:hover {
+  background: rgba(255,255,255,0.06);
+  color: var(--white);
+  border-left-color: rgba(201,168,76,0.5);
+}
+.nav-item.active {
+  background: rgba(201,168,76,0.12);
+  color: var(--gold-light);
+  border-left-color: var(--gold);
+  font-weight: 700;
+}
+.nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+.nav-badge {
+  margin-left: auto; background: var(--gold);
+  color: var(--navy); font-size: 10px; font-weight: 800;
+  padding: 1px 6px; border-radius: 10px;
+}
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.user-info {
+  display: flex; align-items: center; gap: 10px;
+}
+.user-avatar {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800; color: var(--navy);
+}
+.user-name { font-size: 13px; font-weight: 700; color: var(--white); }
+.user-role { font-size: 10px; color: rgba(255,255,255,0.45); }
+.btn-logout {
+  margin-left: auto; background: none; border: none;
+  color: rgba(255,255,255,0.4); cursor: pointer; font-size: 18px;
+  transition: var(--transition); padding: 4px;
+}
+.btn-logout:hover { color: var(--gold); }
+
+/* ============ 메인 콘텐츠 ============ */
+.main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1; display: flex; flex-direction: column;
+  min-height: 100vh;
+}
+.top-header {
+  height: var(--header-h);
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  display: flex; align-items: center;
+  padding: 0 24px; gap: 16px;
+  position: sticky; top: 0; z-index: 50;
+  box-shadow: 0 1px 4px rgba(10,31,68,0.06);
+}
+.page-title {
+  font-size: 17px; font-weight: 800; color: var(--navy);
+  display: flex; align-items: center; gap: 8px;
+}
+.page-title .title-icon { font-size: 20px; }
+.header-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.header-date {
+  font-size: 12px; color: var(--gray-500);
+  background: var(--gray-100); padding: 4px 10px; border-radius: 20px;
+}
+
+.page-body { padding: 24px; flex: 1; }
+
+/* ============ 카드 ============ */
+.card {
+  background: var(--white); border-radius: 12px;
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex; align-items: center; gap: 10px;
+}
+.card-title {
+  font-size: 15px; font-weight: 700; color: var(--navy);
+}
+.card-body { padding: 20px; }
+
+/* ============ 대시보드 통계 카드 ============ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px; margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--white);
+  border-radius: 12px; padding: 20px;
+  box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 16px;
+  border-left: 4px solid transparent;
+  transition: var(--transition);
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.stat-card.navy  { border-left-color: var(--navy); }
+.stat-card.gold  { border-left-color: var(--gold); }
+.stat-card.green { border-left-color: var(--green); }
+.stat-card.red   { border-left-color: var(--red); }
+.stat-card.orange { border-left-color: var(--orange); }
+.stat-icon {
+  width: 50px; height: 50px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.stat-card.navy .stat-icon  { background: rgba(10,31,68,0.08); }
+.stat-card.gold .stat-icon  { background: rgba(201,168,76,0.12); }
+.stat-card.green .stat-icon { background: rgba(46,204,113,0.10); }
+.stat-card.red .stat-icon   { background: rgba(224,60,49,0.10); }
+.stat-card.orange .stat-icon{ background: rgba(243,156,18,0.10); }
+.stat-value {
+  font-size: 26px; font-weight: 800; color: var(--navy);
+  line-height: 1;
+}
+.stat-label { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+.stat-change {
+  font-size: 11px; margin-top: 6px; font-weight: 600;
+}
+.stat-change.up { color: var(--green); }
+.stat-change.down { color: var(--red); }
+
+/* ============ 버튼 ============ */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  border: none; transition: var(--transition);
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: var(--white);
+}
+.btn-primary:hover { background: linear-gradient(135deg, var(--navy-light), var(--navy)); transform: translateY(-1px); }
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: var(--white);
+}
+.btn-gold:hover { background: linear-gradient(135deg, var(--gold), var(--gold-light)); transform: translateY(-1px); }
+.btn-outline {
+  background: transparent; border: 1.5px solid var(--gray-300);
+  color: var(--gray-700);
+}
+.btn-outline:hover { border-color: var(--navy); color: var(--navy); background: var(--gray-100); }
+.btn-danger {
+  background: var(--red); color: var(--white);
+}
+.btn-danger:hover { background: #c0392b; }
+.btn-success {
+  background: var(--green); color: var(--white);
+}
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-lg { padding: 12px 24px; font-size: 15px; }
+.btn-icon { padding: 7px 10px; }
+
+/* ============ 검색 & 필터 바 ============ */
+.toolbar {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.search-box {
+  position: relative; flex: 1; min-width: 200px; max-width: 360px;
+}
+.search-box input {
+  width: 100%; padding: 9px 14px 9px 36px;
+  border: 1.5px solid var(--gray-300); border-radius: var(--radius);
+  font-size: 13px; color: var(--navy); background: var(--white);
+  transition: var(--transition);
+}
+.search-box input:focus {
+  outline: none; border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+}
+.search-icon {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  color: var(--gray-500); font-size: 15px;
+}
+.filter-select {
+  padding: 9px 32px 9px 12px; border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius); font-size: 13px; color: var(--navy);
+  background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237a8aaa' d='M6 8L0 0h12z'/%3E%3C/svg%3E") no-repeat right 10px center;
+  appearance: none; cursor: pointer; transition: var(--transition);
+}
+.filter-select:focus {
+  outline: none; border-color: var(--gold);
+}
+
+/* ============ 테이블 ============ */
+.table-container { overflow-x: auto; border-radius: 0 0 12px 12px; }
+.data-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px;
+}
+.data-table thead tr {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+}
+.data-table thead th {
+  padding: 12px 14px; text-align: left;
+  color: rgba(255,255,255,0.85); font-weight: 700;
+  font-size: 12px; letter-spacing: 0.3px; white-space: nowrap;
+}
+.data-table thead th:first-child { border-radius: 0; }
+.data-table tbody tr {
+  border-bottom: 1px solid var(--gray-200);
+  transition: var(--transition);
+}
+.data-table tbody tr:hover { background: rgba(201,168,76,0.05); }
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-table td {
+  padding: 11px 14px; color: var(--navy);
+  vertical-align: middle; white-space: nowrap;
+}
+.data-table td .cell-main { font-weight: 600; }
+.data-table td .cell-sub { font-size: 11px; color: var(--gray-500); }
+.data-table tfoot tr {
+  background: var(--gray-100);
+  border-top: 2px solid var(--gray-300);
+}
+.data-table tfoot td {
+  padding: 10px 14px; font-weight: 800;
+  color: var(--navy);
+}
+
+/* ============ 배지 ============ */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 3px 8px; border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+}
+.badge-navy    { background: rgba(10,31,68,0.10);    color: var(--navy); }
+.badge-gold    { background: rgba(201,168,76,0.15);  color: var(--gold-dark); }
+.badge-green   { background: rgba(46,204,113,0.12);  color: #27ae60; }
+.badge-red     { background: rgba(224,60,49,0.12);   color: var(--red); }
+.badge-orange  { background: rgba(243,156,18,0.12);  color: #d68910; }
+.badge-gray    { background: var(--gray-200);         color: var(--gray-500); }
+
+/* ============ 폼 ============ */
+.form-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+}
+.form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-grid.cols-1 { grid-template-columns: 1fr; }
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-field.span-2 { grid-column: span 2; }
+.form-label {
+  font-size: 12px; font-weight: 700; color: var(--gray-700);
+}
+.form-label .required { color: var(--red); margin-left: 2px; }
+.form-input, .form-select, .form-textarea {
+  padding: 10px 13px; border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius); font-size: 13px; color: var(--navy);
+  background: var(--white); transition: var(--transition);
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none; border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+}
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-hint { font-size: 11px; color: var(--gray-500); }
+.form-actions {
+  display: flex; justify-content: flex-end; gap: 10px;
+  margin-top: 24px; padding-top: 20px;
+  border-top: 1px solid var(--gray-200);
+}
+
+/* ============ 모달 ============ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(6,15,34,0.6);
+  z-index: 200; display: flex;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(2px);
+  opacity: 0; visibility: hidden; transition: var(--transition);
+}
+.modal-overlay.show { opacity: 1; visibility: visible; }
+.modal {
+  background: var(--white); border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  width: 90%; max-width: 640px;
+  max-height: 90vh; overflow-y: auto;
+  transform: translateY(20px) scale(0.97);
+  transition: var(--transition);
+}
+.modal-overlay.show .modal { transform: translateY(0) scale(1); }
+.modal-lg { max-width: 860px; }
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex; align-items: center; gap: 10px;
+}
+.modal-title {
+  font-size: 16px; font-weight: 800; color: var(--navy);
+}
+.modal-close {
+  margin-left: auto; background: none; border: none;
+  font-size: 20px; cursor: pointer; color: var(--gray-500);
+  transition: var(--transition); padding: 4px;
+}
+.modal-close:hover { color: var(--navy); }
+.modal-body { padding: 24px; }
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--gray-200);
+  display: flex; justify-content: flex-end; gap: 10px;
+}
+
+/* ============ 페이지네이션 ============ */
+.pagination {
+  display: flex; align-items: center; gap: 4px;
+  justify-content: center; margin-top: 20px;
+}
+.page-btn {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius); border: 1.5px solid var(--gray-300);
+  background: var(--white); color: var(--gray-700);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: var(--transition);
+}
+.page-btn:hover { border-color: var(--navy); color: var(--navy); }
+.page-btn.active {
+  background: var(--navy); border-color: var(--navy);
+  color: var(--white);
+}
+.page-info { font-size: 12px; color: var(--gray-500); margin: 0 8px; }
+
+/* ============ 탭 ============ */
+.tab-nav {
+  display: flex; border-bottom: 2px solid var(--gray-200);
+  margin-bottom: 20px; gap: 0;
+}
+.tab-btn {
+  padding: 10px 20px; background: none; border: none;
+  font-size: 13px; font-weight: 600; color: var(--gray-500);
+  cursor: pointer; transition: var(--transition);
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+}
+.tab-btn:hover { color: var(--navy); }
+.tab-btn.active {
+  color: var(--navy); border-bottom-color: var(--gold);
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ============ 알림 토스트 ============ */
+.toast-container {
+  position: fixed; top: 80px; right: 24px; z-index: 999;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+  min-width: 280px; padding: 14px 18px;
+  border-radius: 10px; box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; gap: 12px;
+  background: var(--white); border-left: 4px solid var(--navy);
+  animation: slideIn 0.3s ease;
+  font-size: 13px; font-weight: 600;
+}
+.toast.success { border-left-color: var(--green); }
+.toast.error   { border-left-color: var(--red); }
+.toast.warning { border-left-color: var(--orange); }
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ============ 대시보드 차트 영역 ============ */
+.chart-grid {
+  display: grid; grid-template-columns: 2fr 1fr;
+  gap: 16px; margin-bottom: 24px;
+}
+.chart-placeholder {
+  height: 220px; background: var(--gray-100);
+  border-radius: 8px; display: flex; align-items: center;
+  justify-content: center; color: var(--gray-500);
+  font-size: 13px; border: 2px dashed var(--gray-300);
+}
+
+/* ============ 공지 / 빠른메뉴 ============ */
+.quick-menu-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  margin-bottom: 24px;
+}
+.quick-btn {
+  background: var(--white); border: 1.5px solid var(--gray-200);
+  border-radius: 12px; padding: 20px 16px;
+  text-align: center; cursor: pointer; transition: var(--transition);
+}
+.quick-btn:hover {
+  border-color: var(--gold); background: rgba(201,168,76,0.05);
+  transform: translateY(-2px); box-shadow: var(--shadow);
+}
+.quick-btn .q-icon { font-size: 28px; margin-bottom: 8px; }
+.quick-btn .q-label { font-size: 12px; font-weight: 700; color: var(--navy); }
+
+/* ============ 금전출납 특화 ============ */
+.amount-positive { color: #1a7f37; font-weight: 700; }
+.amount-negative { color: var(--red); font-weight: 700; }
+.amount-neutral  { color: var(--navy); font-weight: 700; }
+.balance-box {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  color: var(--white); border-radius: 12px; padding: 20px 24px;
+  display: flex; align-items: center; gap: 20px; margin-bottom: 20px;
+}
+.balance-item { text-align: center; }
+.balance-item .b-label { font-size: 11px; opacity: 0.7; margin-bottom: 4px; }
+.balance-item .b-value { font-size: 20px; font-weight: 800; }
+.balance-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.2); }
+
+/* ============ 급여 계산기 ============ */
+.calc-box {
+  background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+  color: var(--white); border-radius: 12px; padding: 24px;
+}
+.calc-input-row {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+  margin-bottom: 20px;
+}
+.calc-field label { font-size: 11px; opacity: 0.7; margin-bottom: 6px; display: block; }
+.calc-field input {
+  width: 100%; padding: 10px 12px;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px; color: var(--white); font-size: 14px; font-weight: 600;
+}
+.calc-field input::placeholder { color: rgba(255,255,255,0.3); }
+.calc-field input:focus {
+  outline: none; border-color: var(--gold);
+  background: rgba(255,255,255,0.15);
+}
+.calc-result {
+  background: rgba(255,255,255,0.08); border-radius: 10px;
+  padding: 16px 20px;
+}
+.calc-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-size: 13px;
+}
+.calc-row:last-child { border-bottom: none; }
+.calc-row .r-label { opacity: 0.75; }
+.calc-row .r-value { font-weight: 700; }
+.calc-row .r-value.deduct { color: #ff7675; }
+.calc-row .r-value.net    { color: var(--gold-light); font-size: 16px; }
+.calc-row.total { margin-top: 8px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2); }
+
+/* ============ 홈페이지 (공개용) ============ */
+.website-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,31,68,0.95); backdrop-filter: blur(8px);
+  padding: 0 40px; height: 70px;
+  display: flex; align-items: center; gap: 0;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+}
+.website-logo { font-size: 22px; font-weight: 800; color: var(--white); }
+.website-logo span { color: var(--gold); }
+.website-nav-links { margin-left: auto; display: flex; gap: 32px; }
+.website-nav-links a {
+  color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 500;
+  transition: var(--transition);
+}
+.website-nav-links a:hover { color: var(--gold); }
+.btn-nav-login {
+  margin-left: 32px; background: var(--gold);
+  color: var(--navy); padding: 8px 20px; border-radius: 6px;
+  font-weight: 700; font-size: 13px; transition: var(--transition);
+}
+.btn-nav-login:hover { background: var(--gold-light); }
+
+.hero-section {
+  min-height: 100vh; padding-top: 70px;
+  background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 60%, var(--navy-light) 100%);
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; position: relative; overflow: hidden;
+}
+.hero-bg-pattern {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 20% 50%, rgba(201,168,76,0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(201,168,76,0.05) 0%, transparent 40%);
+}
+.hero-content { position: relative; z-index: 1; max-width: 760px; padding: 0 20px; }
+.hero-badge {
+  display: inline-block; background: rgba(201,168,76,0.15);
+  color: var(--gold); border: 1px solid rgba(201,168,76,0.3);
+  padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 700;
+  margin-bottom: 24px; letter-spacing: 1px;
+}
+.hero-title {
+  font-size: 52px; font-weight: 900; color: var(--white);
+  line-height: 1.15; margin-bottom: 20px; letter-spacing: -1px;
+}
+.hero-title .highlight { color: var(--gold); }
+.hero-subtitle {
+  font-size: 18px; color: rgba(255,255,255,0.7);
+  margin-bottom: 40px; line-height: 1.7;
+}
+.hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.btn-hero-primary {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: var(--navy); padding: 16px 36px; border-radius: 8px;
+  font-size: 15px; font-weight: 800; transition: var(--transition);
+  box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+}
+.btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,168,76,0.5); }
+.btn-hero-secondary {
+  background: rgba(255,255,255,0.1); color: var(--white);
+  padding: 16px 36px; border-radius: 8px;
+  font-size: 15px; font-weight: 700;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  transition: var(--transition);
+}
+.btn-hero-secondary:hover { background: rgba(255,255,255,0.18); }
+.hero-stats {
+  display: flex; gap: 48px; justify-content: center;
+  margin-top: 60px; padding-top: 40px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.hero-stat .h-value {
+  font-size: 34px; font-weight: 900; color: var(--gold);
+}
+.hero-stat .h-label { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 4px; }
+
+.services-section {
+  padding: 80px 40px; background: var(--white);
+}
+.section-header { text-align: center; margin-bottom: 48px; }
+.section-badge {
+  display: inline-block; background: rgba(201,168,76,0.1);
+  color: var(--gold-dark); border-radius: 20px;
+  padding: 5px 14px; font-size: 12px; font-weight: 700;
+  margin-bottom: 12px; letter-spacing: 0.5px;
+}
+.section-title {
+  font-size: 34px; font-weight: 900; color: var(--navy);
+  letter-spacing: -0.5px;
+}
+.section-sub { font-size: 15px; color: var(--gray-500); margin-top: 10px; }
+.service-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
+.service-card {
+  border: 1.5px solid var(--gray-200); border-radius: 16px;
+  padding: 28px 20px; text-align: center; transition: var(--transition);
+}
+.service-card:hover {
+  border-color: var(--gold); transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(10,31,68,0.12);
+}
+.service-icon {
+  width: 64px; height: 64px; margin: 0 auto 16px;
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  border-radius: 16px; display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+}
+.service-name { font-size: 16px; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
+.service-desc { font-size: 13px; color: var(--gray-500); line-height: 1.7; }
+
+.license-section {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  padding: 60px 40px; text-align: center;
+}
+.license-badge {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: rgba(201,168,76,0.15); border: 2px solid var(--gold);
+  border-radius: 16px; padding: 20px 36px;
+}
+.license-badge .l-icon { font-size: 36px; }
+.license-info .l-title { font-size: 18px; font-weight: 800; color: var(--gold); }
+.license-info .l-desc { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+.contact-section { padding: 80px 40px; background: var(--gray-100); }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 900px; margin: 0 auto; }
+.contact-form-card {
+  background: var(--white); border-radius: 16px; padding: 36px;
+  box-shadow: var(--shadow);
+}
+
+.site-footer {
+  background: var(--navy-dark); color: rgba(255,255,255,0.5);
+  padding: 32px 40px; text-align: center; font-size: 12px;
+  line-height: 2;
+}
+.site-footer strong { color: rgba(255,255,255,0.8); }
+
+/* ============ 반응형 ============ */
+@media (max-width: 1200px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .service-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .hero-title { font-size: 32px; }
+  .quick-menu-grid { grid-template-columns: repeat(2,1fr); }
+  .chart-grid { grid-template-columns: 1fr; }
+}
+
+/* ============ 유틸리티 ============ */
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.font-bold { font-weight: 700; }
+.font-mono { font-family: 'Courier New', monospace; }
+.color-gold  { color: var(--gold-dark); }
+.color-navy  { color: var(--navy); }
+.color-green { color: var(--green); }
+.color-red   { color: var(--red); }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mb-16 { margin-bottom: 16px; }
+.mb-24 { margin-bottom: 24px; }
+.gap-8 { gap: 8px; }
+.flex { display: flex; }
+.flex-center { display: flex; align-items: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-wrap { flex-wrap: wrap; }
+.hidden { display: none !important; }
+.divider { height: 1px; background: var(--gray-200); margin: 20px 0; }
+
+/* ============ 로딩 스피너 ============ */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--gray-300);
+  border-top-color: var(--navy);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============ 인쇄 스타일 ============ */
+@media print {
+  .sidebar, .top-header, .toolbar, .pagination, .btn, .modal-overlay { display: none !important; }
+  .main-content { margin-left: 0; }
+  .data-table thead tr { background: var(--navy) !important; -webkit-print-color-adjust: exact; }
+}
+
+/* ============================================
+   추가 섹션: 고객사 로고 / 채용공고 / 카카오
+   ============================================ */
+
+/* ─── 고객사 배너 ─────────────────────────── */
+.clients-section {
+  padding: 80px 40px 60px;
+  background: var(--white);
+  overflow: hidden;
+}
+.client-tabs {
+  display: flex; gap: 8px; justify-content: center;
+  flex-wrap: wrap; margin-bottom: 40px;
+}
+.client-tab {
+  padding: 7px 18px; border-radius: 20px;
+  border: 1.5px solid var(--gray-300);
+  background: var(--white); color: var(--gray-700);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: var(--transition);
+}
+.client-tab:hover  { border-color: var(--navy); color: var(--navy); }
+.client-tab.active {
+  background: var(--navy); border-color: var(--navy);
+  color: var(--white);
+}
+
+/* 마퀴 슬라이더 */
+.marquee-wrapper {
+  width: 100%; overflow: hidden;
+  position: relative; margin: 0 -40px;
+  padding: 10px 0;
+}
+.marquee-wrapper::before,
+.marquee-wrapper::after {
+  content: '';
+  position: absolute; top: 0; bottom: 0; width: 100px; z-index: 2;
+}
+.marquee-wrapper::before { left:  0; background: linear-gradient(to right,  #fff, transparent); }
+.marquee-wrapper::after  { right: 0; background: linear-gradient(to left,   #fff, transparent); }
+.marquee-track {
+  display: flex; gap: 16px;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+.marquee-track:hover { animation-play-state: paused; }
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.logo-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 160px; height: 100px;
+  background: var(--white); border: 1.5px solid var(--gray-200);
+  border-radius: 14px; padding: 16px 12px;
+  text-align: center; cursor: default;
+  transition: var(--transition); flex-shrink: 0;
+  box-shadow: 0 1px 6px rgba(10,31,68,0.06);
+}
+.logo-card:hover {
+  border-color: var(--gold);
+  box-shadow: 0 4px 16px rgba(201,168,76,0.2);
+  transform: translateY(-3px);
+}
+.lc-icon { font-size: 26px; margin-bottom: 6px; }
+.lc-name { font-size: 12px; font-weight: 800; color: var(--navy); line-height: 1.3; }
+.lc-type { font-size: 10px; color: var(--gray-500); margin-top: 3px; }
+
+/* 거래처 통계 행 */
+.client-stats-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin-top: 48px;
+  background: var(--gray-100); border-radius: 16px;
+  padding: 24px 40px; max-width: 700px; margin: 48px auto 0;
+}
+.cstat { text-align: center; padding: 0 32px; }
+.cs-num {
+  display: block; font-size: 28px; font-weight: 900;
+  color: var(--navy); line-height: 1;
+}
+.cs-label { font-size: 12px; color: var(--gray-500); margin-top: 4px; display: block; }
+.cstat-divider {
+  width: 1px; height: 40px;
+  background: var(--gray-300);
+}
+
+/* ─── 채용 공고 게시판 ────────────────────── */
+.jobs-section {
+  padding: 80px 40px;
+  background: var(--gray-100);
+}
+.jobs-filter-bar {
+  display: flex; gap: 10px; align-items: center;
+  flex-wrap: wrap; max-width: 1000px; margin: 0 auto 32px;
+}
+.jf-search {
+  display: flex; align-items: center; gap: 8px;
+  flex: 1; min-width: 220px;
+  background: var(--white); border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius); padding: 9px 14px;
+  transition: var(--transition);
+}
+.jf-search:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+}
+.jf-search input {
+  border: none; outline: none;
+  font-size: 13px; color: var(--navy); background: none; width: 100%;
+}
+.jf-select {
+  padding: 9px 32px 9px 12px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius); font-size: 13px; color: var(--navy);
+  background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237a8aaa' d='M6 8L0 0h12z'/%3E%3C/svg%3E") no-repeat right 10px center;
+  appearance: none; cursor: pointer; transition: var(--transition);
+}
+.jf-select:focus { outline: none; border-color: var(--gold); }
+
+/* 공고 그리드 */
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px; max-width: 1000px; margin: 0 auto;
+}
+@media (max-width: 1100px) { .jobs-grid { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 640px)  { .jobs-grid { grid-template-columns: 1fr; } }
+
+.job-card {
+  background: var(--white); border-radius: 16px;
+  padding: 22px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 12px;
+  border: 1.5px solid transparent; transition: var(--transition);
+}
+.job-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(10,31,68,0.12);
+}
+.jc-top {
+  display: flex; align-items: center;
+  justify-content: space-between;
+}
+.jc-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.jc-badge {
+  font-size: 11px; font-weight: 700; padding: 3px 9px;
+  border-radius: 20px;
+}
+.jc-badge.urgent { background: rgba(224,60,49,0.1); color: var(--red); }
+.jc-badge.type   { background: rgba(10,31,68,0.08); color: var(--navy); }
+.jc-badge.long   { background: rgba(46,204,113,0.1); color: #27ae60; }
+.jc-date { font-size: 11px; color: var(--gray-500); }
+.jc-title {
+  font-size: 15px; font-weight: 800; color: var(--navy);
+  line-height: 1.4;
+}
+.jc-company { font-size: 12px; color: var(--gray-500); }
+.jc-info-row {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  font-size: 12px; color: var(--gray-700);
+}
+.jc-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.jc-tag {
+  background: var(--gray-100); color: var(--gray-700);
+  font-size: 11px; font-weight: 600; padding: 3px 9px;
+  border-radius: 20px;
+}
+.jc-apply-btn {
+  margin-top: auto;
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: var(--white); border: none; border-radius: var(--radius);
+  padding: 10px; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: var(--transition); width: 100%;
+}
+.jc-apply-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  transform: translateY(-1px);
+}
+.jc-apply-btn:disabled { cursor: not-allowed; }
+.jobs-empty {
+  text-align: center; padding: 48px; font-size: 14px;
+  color: var(--gray-500); max-width: 1000px; margin: 0 auto;
+}
+
+/* ─── 카카오 플로팅 버튼 ──────────────────── */
+.kakao-float {
+  position: fixed; right: 28px; bottom: 36px; z-index: 1000;
+}
+.kakao-float-btn {
+  width: 58px; height: 58px; border-radius: 50%;
+  background: #FEE500; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  transition: var(--transition);
+  font-size: 28px; /* 이모지 fallback */
+}
+.kakao-float-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 28px rgba(0,0,0,0.28);
+}
+/* 이모지 아이콘 대체 */
+.kakao-float-btn::before { content: '💬'; font-size: 26px; }
+.kakao-float-btn svg { display: none; }
+
+/* 말풍선 툴팁 */
+.kakao-tooltip {
+  position: absolute; right: 0; bottom: 70px;
+  background: var(--white); border-radius: 16px;
+  padding: 20px; width: 220px;
+  box-shadow: var(--shadow-lg);
+  opacity: 0; visibility: hidden;
+  transform: translateY(10px);
+  transition: var(--transition);
+  border: 1px solid var(--gray-200);
+}
+.kakao-tooltip.show {
+  opacity: 1; visibility: visible;
+  transform: translateY(0);
+}
+.kt-arrow {
+  position: absolute; right: 22px; bottom: -8px;
+  width: 16px; height: 16px;
+  background: var(--white); border-right: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-200);
+  transform: rotate(45deg);
+}
+.kt-title {
+  font-size: 14px; font-weight: 800; color: var(--navy);
+  margin-bottom: 6px;
+}
+.kt-desc {
+  font-size: 12px; color: var(--gray-500); line-height: 1.7;
+  margin-bottom: 14px;
+}
+.kt-btn {
+  display: block; width: 100%; text-align: center;
+  background: #FEE500; color: #3C1E1E;
+  border-radius: var(--radius); padding: 9px;
+  font-size: 13px; font-weight: 700;
+  transition: var(--transition); margin-bottom: 8px;
+}
+.kt-btn:hover { background: #FFD700; }
+.kt-btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--gray-300); color: var(--gray-700);
+}
+.kt-btn-outline:hover { border-color: var(--navy); color: var(--navy); background: var(--gray-100); }
+
+/* ============================================
+   추가: 햄버거 메뉴 / 지도 / 프로세스 / 폼상태
+   ============================================ */
+
+/* ── 네비 확장 ───────────────────────────── */
+.website-nav.scrolled {
+  background: rgba(6,15,34,0.98) !important;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+.website-nav-links a.active { color: var(--gold) !important; }
+
+.nav-right {
+  display: flex; align-items: center; gap: 12px;
+  margin-left: auto;
+}
+.kakao-login-status {
+  font-size: 11px; display: flex; align-items: center; gap: 6px;
+}
+.kls-on  { color: #2ecc71; font-weight: 700; }
+.kls-off { color: rgba(255,255,255,0.5); font-weight: 600; }
+
+/* ── 햄버거 버튼 ─────────────────────────── */
+.hamburger-btn {
+  display: none;
+  flex-direction: column; justify-content: center; align-items: center;
+  width: 40px; height: 40px; gap: 5px;
+  background: none; border: none; cursor: pointer;
+  padding: 4px; border-radius: 6px;
+  transition: var(--transition);
+}
+.hamburger-btn:hover { background: rgba(255,255,255,0.08); }
+.hb-line {
+  display: block; width: 22px; height: 2px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 2px; transition: var(--transition);
+  transform-origin: center;
+}
+/* 활성 시 X 모양 */
+.hamburger-btn.active .hb-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger-btn.active .hb-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger-btn.active .hb-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── 모바일 오버레이 ─────────────────────── */
+.mobile-nav-overlay {
+  display: none; position: fixed;
+  inset: 0; background: rgba(0,0,0,0.55); z-index: 498;
+  backdrop-filter: blur(2px);
+}
+.mobile-nav-overlay.show { display: block; }
+
+/* ── 모바일 드로어 ──────────────────────── */
+.mobile-nav-drawer {
+  position: fixed; top: 0; right: -320px; bottom: 0;
+  width: 300px; z-index: 499;
+  background: var(--navy-dark);
+  display: flex; flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: -4px 0 32px rgba(0,0,0,0.4);
+}
+.mobile-nav-drawer.open { right: 0; }
+
+.mnd-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.mnd-logo {
+  font-size: 20px; font-weight: 800; color: var(--white);
+}
+.mnd-logo span { color: var(--gold); }
+.mnd-close {
+  background: none; border: none; font-size: 20px;
+  color: rgba(255,255,255,0.5); cursor: pointer; padding: 4px;
+  transition: var(--transition);
+}
+.mnd-close:hover { color: var(--gold); }
+
+.mnd-nav {
+  flex: 1; padding: 12px 0; overflow-y: auto;
+}
+.mnd-link {
+  display: block; padding: 14px 24px;
+  color: rgba(255,255,255,0.75); font-size: 15px; font-weight: 600;
+  border-left: 3px solid transparent; transition: var(--transition);
+}
+.mnd-link:hover, .mnd-link:active {
+  background: rgba(201,168,76,0.1);
+  color: var(--gold-light);
+  border-left-color: var(--gold);
+}
+.mnd-footer {
+  padding: 20px; border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ── 프로세스 섹션 개선 ──────────────────── */
+.process-section {
+  padding: 80px 40px;
+  background: var(--gray-100);
+}
+.process-steps {
+  display: flex; align-items: flex-start;
+  max-width: 900px; margin: 0 auto;
+  gap: 0;
+}
+.process-step {
+  flex: 1; text-align: center; position: relative; padding: 0 8px;
+}
+.process-step:not(.last)::after {
+  content: '';
+  position: absolute; top: 30px; left: calc(50% + 36px);
+  width: calc(100% - 72px); height: 2px;
+  background: linear-gradient(to right, var(--gold), rgba(201,168,76,0.3));
+}
+.ps-circle {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; margin: 0 auto 12px;
+  box-shadow: 0 4px 16px rgba(10,31,68,0.2);
+  position: relative; z-index: 1;
+}
+.ps-title { font-size: 13px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+.ps-desc  { font-size: 11px; color: var(--gray-500); line-height: 1.5; }
+
+/* ── 카카오맵 위치 섹션 ──────────────────── */
+.location-section {
+  padding: 80px 40px;
+  background: var(--white);
+}
+.location-container {
+  display: grid; grid-template-columns: 1fr 380px;
+  gap: 32px; max-width: 1100px; margin: 0 auto;
+  align-items: start;
+}
+.map-wrapper { display: flex; flex-direction: column; gap: 12px; }
+.kakao-map-box {
+  width: 100%; height: 420px; border-radius: 16px;
+  overflow: hidden; box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-200);
+  position: relative; background: var(--gray-100);
+}
+.map-fallback {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  height: 100%; gap: 12px; text-align: center;
+  padding: 24px;
+}
+.mf-icon  { font-size: 48px; }
+.mf-addr  { font-size: 14px; font-weight: 700; color: var(--navy); }
+.mf-btn {
+  display: inline-block; padding: 10px 20px; border-radius: 8px;
+  background: #FEE500; color: #3C1E1E;
+  font-size: 13px; font-weight: 700; transition: var(--transition);
+  margin: 4px;
+}
+.mf-btn:hover { background: #FFD700; }
+.mf-btn-naver { background: #03C75A; color: white; }
+.mf-btn-naver:hover { background: #02a84b; }
+
+.map-actions { display: flex; gap: 8px; }
+.map-action-btn {
+  flex: 1; text-align: center; padding: 10px 8px;
+  border-radius: 8px; font-size: 12px; font-weight: 700;
+  transition: var(--transition);
+}
+.map-action-btn.kakao  { background: #FEE500; color: #3C1E1E; }
+.map-action-btn.naver  { background: #03C75A; color: white; }
+.map-action-btn.google { background: #4285F4; color: white; }
+.map-action-btn:hover  { transform: translateY(-2px); box-shadow: var(--shadow); }
+
+.location-info { display: flex; flex-direction: column; gap: 12px; }
+.li-card {
+  background: var(--white); border: 1.5px solid var(--gray-200);
+  border-radius: 12px; padding: 16px 20px;
+  transition: var(--transition);
+}
+.li-card:hover { border-color: var(--gold); }
+.li-card-highlight {
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  border-color: transparent;
+  color: rgba(255,255,255,0.9);
+}
+.li-card-highlight .li-title { color: var(--gold-light); }
+.li-card-highlight .li-content { color: rgba(255,255,255,0.8); }
+.li-title   { font-size: 12px; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
+.li-content { font-size: 13px; color: var(--gray-700); line-height: 1.8; }
+.li-row     { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.li-badge {
+  padding: 2px 8px; border-radius: 4px;
+  font-size: 10px; font-weight: 700; white-space: nowrap;
+}
+.li-badge.bus    { background: rgba(10,31,68,0.1); color: var(--navy); }
+.li-badge.subway { background: rgba(46,204,113,0.1); color: #27ae60; }
+
+/* ── 폼 제출 상태 ────────────────────────── */
+.submit-status {
+  padding: 10px 14px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 600; margin-top: 8px;
+  display: none;
+}
+.submit-status.show   { display: block; }
+.submit-status.success { background: rgba(46,204,113,0.1); color: #1a7f37; border: 1px solid rgba(46,204,113,0.3); }
+.submit-status.error   { background: rgba(224,60,49,0.08); color: var(--red); border: 1px solid rgba(224,60,49,0.2); }
+.submit-status.info    { background: rgba(10,31,68,0.05); color: var(--navy); border: 1px solid var(--gray-300); }
+
+/* ── 카카오 설정 카드 ────────────────────── */
+.kakao-setup-card { border: 1.5px solid #FEE500 !important; }
+
+/* ── 반응형 모바일 (768px 이하) ─────────── */
+@media (max-width: 768px) {
+
+  /* 햄버거 버튼 표시 */
+  .hamburger-btn { display: flex; }
+
+  /* 데스크탑 링크 숨김 */
+  .website-nav-links { display: none; }
+  .btn-nav-login { display: none; }
+
+  /* 네비 패딩 축소 */
+  .website-nav { padding: 0 16px; }
+
+  /* 히어로 */
+  .hero-title  { font-size: 28px; }
+  .hero-subtitle { font-size: 15px; }
+  .hero-stats  { gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .hero-stat .h-value { font-size: 24px; }
+
+  /* 서비스 그리드 */
+  .service-grid { grid-template-columns: 1fr 1fr; }
+
+  /* 거래처 통계 */
+  .client-stats-row { padding: 20px; gap: 0; }
+  .cstat { padding: 0 16px; }
+  .cs-num { font-size: 20px; }
+
+  /* 채용 그리드 */
+  .jobs-grid { grid-template-columns: 1fr; }
+  .jobs-filter-bar { flex-direction: column; }
+  .jf-search { min-width: 100%; }
+
+  /* 프로세스 */
+  .process-steps {
+    flex-direction: column; align-items: center; gap: 0;
+  }
+  .process-step {
+    display: flex; align-items: center; width: 100%;
+    padding: 12px 0; text-align: left; gap: 16px;
+  }
+  .process-step:not(.last)::after {
+    display: none;
+  }
+  .process-step:not(.last)::before {
+    content: '';
+    position: absolute; left: 29px; top: 72px;
+    width: 2px; height: 24px;
+    background: linear-gradient(to bottom, var(--gold), rgba(201,168,76,0.3));
+  }
+  .ps-circle { margin: 0; flex-shrink: 0; }
+  .ps-title  { text-align: left; }
+  .ps-desc   { text-align: left; }
+
+  /* 지도 */
+  .location-container { grid-template-columns: 1fr; }
+  .kakao-map-box { height: 280px; }
+  .map-actions   { flex-wrap: wrap; }
+  .location-section { padding: 60px 20px; }
+
+  /* 문의 */
+  .contact-grid { grid-template-columns: 1fr; }
+  .contact-section { padding: 60px 20px; }
+
+  /* 섹션 패딩 */
+  .services-section, .clients-section, .jobs-section,
+  .process-section, .location-section { padding-left: 20px; padding-right: 20px; }
+  .license-section { padding: 48px 20px; }
+  .section-title   { font-size: 26px; }
+}
+
+/* ── 태블릿 (769 ~ 1024px) ──────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .website-nav-links { gap: 18px; }
+  .website-nav-links a { font-size: 13px; }
+  .location-container { grid-template-columns: 1fr 300px; }
+  .kakao-map-box { height: 360px; }
+  .jobs-grid { grid-template-columns: repeat(2,1fr); }
+}
+
+/* ═══════════════════════════════════════════
+   파일 첨부 드래그 앤 드롭 영역
+   ═══════════════════════════════════════════ */
+.file-drop-area {
+  border: 2px dashed var(--gray-200);
+  border-radius: 10px;
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: .2s;
+  background: var(--gray-50);
+}
+.file-drop-area:hover,
+.file-drop-area.drag {
+  border-color: var(--gold);
+  background: rgba(201,168,76,.05);
+}
+.file-drop-icon { font-size: 28px; margin-bottom: 8px; }
+.file-drop-text { font-size: 13px; font-weight: 700; color: var(--navy); }
+.file-drop-hint { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.file-item.file-error {
+  border-color: var(--red);
+  background: rgba(224,60,49,.04);
+}
+
+/* ── 카카오 알림 설정 카드 ── */
+.kakao-setup-card { border-left: 3px solid #fee500; }
+.kls-on  { color: var(--green);  font-size: 12px; font-weight: 700; }
+.kls-off { color: var(--gray-400); font-size: 12px; }
+
+</style>
+<body>
+<div id="websitePage" style="background:#fff">
+
+  <!-- ── 모바일 메뉴 오버레이 ── -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
+
+  <!-- ── 네비게이션 ── -->
+  <nav class="website-nav" id="websiteNav">
+    <div class="website-logo">BRIDGE<span>WORKS</span></div>
+
+    <!-- 데스크탑 링크 -->
+    <div class="website-nav-links" id="navLinks">
+      <a href="#about"   onclick="navScroll(event,'about')">회사소개</a>
+      <a href="#services" onclick="navScroll(event,'services')">서비스</a>
+      <a href="#clients"  onclick="navScroll(event,'clients')">거래처</a>
+      <a href="#jobs"     onclick="navScroll(event,'jobs')">채용공고</a>
+      <a href="#process"  onclick="navScroll(event,'process')">이용안내</a>
+      <a href="#location" onclick="navScroll(event,'location')">오시는길</a>
+      <a href="#contact"  onclick="navScroll(event,'contact')">문의</a>
+    </div>
+
+    <div class="nav-right">
+      <!-- 카카오 알림 상태 (관리자용) -->
+      <div id="kakaoLoginStatus" class="kakao-login-status"></div>
+      <a class="btn-nav-login" onclick="closeWebsite()" style="cursor:pointer">관리자 로그인</a>
+      <!-- 햄버거 버튼 -->
+      <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileNav()" aria-label="메뉴 열기">
+        <span class="hb-line"></span>
+        <span class="hb-line"></span>
+        <span class="hb-line"></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- 모바일 드로어 메뉴 -->
+  <div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <div class="mnd-header">
+      <div class="mnd-logo">BRIDGE<span>WORKS</span></div>
+      <button class="mnd-close" onclick="closeMobileNav()">✕</button>
+    </div>
+    <nav class="mnd-nav">
+      <a class="mnd-link" href="#about"    onclick="mobileNavGo('about')">🏢 회사소개</a>
+      <a class="mnd-link" href="#services" onclick="mobileNavGo('services')">🤝 서비스</a>
+      <a class="mnd-link" href="#clients"  onclick="mobileNavGo('clients')">🏭 주요거래처</a>
+      <a class="mnd-link" href="#jobs"     onclick="mobileNavGo('jobs')">📋 채용공고</a>
+      <a class="mnd-link" href="#process"  onclick="mobileNavGo('process')">📌 이용안내</a>
+      <a class="mnd-link" href="#location" onclick="mobileNavGo('location')">📍 오시는길</a>
+      <a class="mnd-link" href="#contact"  onclick="mobileNavGo('contact')">📞 문의/신청</a>
+    </nav>
+    <div class="mnd-footer">
+      <a class="btn btn-gold" href="#contact" onclick="mobileNavGo('contact')" style="width:100%;justify-content:center">
+        📝 구인/구직 신청하기
+      </a>
+      <div style="margin-top:12px;font-size:12px;color:var(--gray-500);text-align:center">
+        경기도 수원시 권선구 정조로 458, 301호
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 히어로 ── -->
+  <section class="hero-section" id="home">
+    <div class="hero-bg-pattern"></div>
+    <div class="hero-content">
+      <div class="hero-badge">🏅 고용노동부 공식 허가 근로자파견사업자 | 허가번호 2025-23</div>
+      <h1 class="hero-title">
+        인재와 기업을<br>연결하는 <span class="highlight">브릿지</span>
+      </h1>
+      <p class="hero-subtitle">
+        수원·화성·용인 지역 인력공급·근로자파견·청소용역 전문<br>
+        브릿지웍스 주식회사가 최적의 인력을 연결해드립니다
+      </p>
+      <div class="hero-buttons">
+        <a class="btn-hero-primary" href="#contact" onclick="navScroll(event,'contact')">구인 신청하기</a>
+        <a class="btn-hero-secondary" href="#services" onclick="navScroll(event,'services')">서비스 알아보기</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="h-value" data-count="3742">3,742</div><div class="h-label">등록 인력</div></div>
+        <div class="hero-stat"><div class="h-value" data-count="540">540</div><div class="h-label">거래 업체</div></div>
+        <div class="hero-stat"><div class="h-value">5년+</div><div class="h-label">운영 경력</div></div>
+        <div class="hero-stat"><div class="h-value">24H</div><div class="h-label">긴급 대응</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 파견 허가 인증 배너 ── -->
+  <div class="license-section" id="about">
+    <div class="section-header" style="margin-bottom:28px">
+      <div class="section-badge" style="background:rgba(201,168,76,0.15);color:var(--gold)">CERTIFIED</div>
+      <h2 class="section-title" style="color:white">공식 인증 파견사업자</h2>
+    </div>
+    <div class="license-badge">
+      <span class="l-icon">🏛️</span>
+      <div class="license-info">
+        <div class="l-title">고용노동부 | 근로자파견사업 허가</div>
+        <div class="l-desc">허가번호: 2025-23 &nbsp;|&nbsp; 허가기간: 2025.1.8 ~ 2028.1.7 &nbsp;|&nbsp; 발급기관: 중부지방고용노동청 경기지청</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 서비스 ── -->
+  <section class="services-section" id="services">
+    <div class="section-header">
+      <div class="section-badge">OUR SERVICES</div>
+      <h2 class="section-title">전문 서비스</h2>
+      <p class="section-sub">다양한 분야의 인력 솔루션을 제공합니다</p>
+    </div>
+    <div class="service-grid" style="max-width:1000px;margin:0 auto">
+      <div class="service-card">
+        <div class="service-icon">🤝</div>
+        <div class="service-name">근로자 파견</div>
+        <div class="service-desc">고용노동부 허가를 받은 합법적인 근로자파견 서비스. 생산직·서비스직·청소 등 다양한 직종 파견</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">👥</div>
+        <div class="service-name">인력공급·고용알선</div>
+        <div class="service-desc">구인업체와 구직자를 연결하는 전문 직업소개 서비스. 수도권 전 지역 커버</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🧹</div>
+        <div class="service-name">청소용역</div>
+        <div class="service-desc">건물·아파트·공장·사무실 등 전문 청소용역 서비스. 정기·일시 청소 모두 가능</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📊</div>
+        <div class="service-name">경영 컨설팅</div>
+        <div class="service-desc">인사노무 관련 경영 컨설팅. 4대보험, 노무관리, 근로계약 전반에 걸친 전문 조언</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 고객사 로고 배너 ── -->
+  <section id="clients" class="clients-section">
+    <div class="section-header">
+      <div class="section-badge">OUR CLIENTS</div>
+      <h2 class="section-title">주요 거래처</h2>
+      <p class="section-sub">수원·화성·용인 지역 540여 개 기업과 함께합니다</p>
+    </div>
+    <div class="client-tabs">
+      <button class="client-tab active" onclick="filterClients('all',this)">전체</button>
+      <button class="client-tab" onclick="filterClients('건설',this)">🏗️ 건설·건축</button>
+      <button class="client-tab" onclick="filterClients('제조',this)">🏭 제조·생산</button>
+      <button class="client-tab" onclick="filterClients('물류',this)">🚛 물류·운송</button>
+      <button class="client-tab" onclick="filterClients('청소',this)">🧹 청소·위생</button>
+      <button class="client-tab" onclick="filterClients('서비스',this)">🏢 서비스</button>
+    </div>
+    <div class="marquee-wrapper">
+      <div class="marquee-track" id="marqueeTrack">
+        <div class="logo-card" data-cat="건설"><div class="lc-icon">🏗️</div><div class="lc-name">수원건설(주)</div><div class="lc-type">건설·건축</div></div>
+        <div class="logo-card" data-cat="제조"><div class="lc-icon">🏭</div><div class="lc-name">(주)한국제조</div><div class="lc-type">제조·생산</div></div>
+        <div class="logo-card" data-cat="물류"><div class="lc-icon">🚛</div><div class="lc-name">경기물류센터</div><div class="lc-type">물류·운송</div></div>
+        <div class="logo-card" data-cat="청소"><div class="lc-icon">🧹</div><div class="lc-name">클린서비스(주)</div><div class="lc-type">청소·위생</div></div>
+        <div class="logo-card" data-cat="서비스"><div class="lc-icon">🏢</div><div class="lc-name">화성산업단지</div><div class="lc-type">서비스</div></div>
+        <div class="logo-card" data-cat="건설"><div class="lc-icon">🏗️</div><div class="lc-name">용인건축(주)</div><div class="lc-type">건설·건축</div></div>
+        <div class="logo-card" data-cat="제조"><div class="lc-icon">🏭</div><div class="lc-name">수원전자부품</div><div class="lc-type">제조·생산</div></div>
+        <div class="logo-card" data-cat="물류"><div class="lc-icon">🚛</div><div class="lc-name">동탄물류(주)</div><div class="lc-type">물류·운송</div></div>
+        <div class="logo-card" data-cat="청소"><div class="lc-icon">🧹</div><div class="lc-name">에코클린(주)</div><div class="lc-type">청소·위생</div></div>
+        <div class="logo-card" data-cat="서비스"><div class="lc-icon">🏢</div><div class="lc-name">권선유통(주)</div><div class="lc-type">서비스</div></div>
+        <div class="logo-card" data-cat="건설"><div class="lc-icon">🏗️</div><div class="lc-name">정조건설(주)</div><div class="lc-type">건설·건축</div></div>
+        <div class="logo-card" data-cat="제조"><div class="lc-icon">🏭</div><div class="lc-name">기흥산업(주)</div><div class="lc-type">제조·생산</div></div>
+        <div class="logo-card" data-cat="물류"><div class="lc-icon">🚛</div><div class="lc-name">수원종합물류</div><div class="lc-type">물류·운송</div></div>
+        <div class="logo-card" data-cat="서비스"><div class="lc-icon">🏢</div><div class="lc-name">팔달유통(주)</div><div class="lc-type">서비스</div></div>
+        <!-- 무한루프용 복제 -->
+        <div class="logo-card" data-cat="건설"><div class="lc-icon">🏗️</div><div class="lc-name">수원건설(주)</div><div class="lc-type">건설·건축</div></div>
+        <div class="logo-card" data-cat="제조"><div class="lc-icon">🏭</div><div class="lc-name">(주)한국제조</div><div class="lc-type">제조·생산</div></div>
+        <div class="logo-card" data-cat="물류"><div class="lc-icon">🚛</div><div class="lc-name">경기물류센터</div><div class="lc-type">물류·운송</div></div>
+        <div class="logo-card" data-cat="청소"><div class="lc-icon">🧹</div><div class="lc-name">클린서비스(주)</div><div class="lc-type">청소·위생</div></div>
+        <div class="logo-card" data-cat="서비스"><div class="lc-icon">🏢</div><div class="lc-name">화성산업단지</div><div class="lc-type">서비스</div></div>
+        <div class="logo-card" data-cat="건설"><div class="lc-icon">🏗️</div><div class="lc-name">용인건축(주)</div><div class="lc-type">건설·건축</div></div>
+        <div class="logo-card" data-cat="제조"><div class="lc-icon">🏭</div><div class="lc-name">수원전자부품</div><div class="lc-type">제조·생산</div></div>
+        <div class="logo-card" data-cat="물류"><div class="lc-icon">🚛</div><div class="lc-name">동탄물류(주)</div><div class="lc-type">물류·운송</div></div>
+        <div class="logo-card" data-cat="청소"><div class="lc-icon">🧹</div><div class="lc-name">에코클린(주)</div><div class="lc-type">청소·위생</div></div>
+        <div class="logo-card" data-cat="서비스"><div class="lc-icon">🏢</div><div class="lc-name">권선유통(주)</div><div class="lc-type">서비스</div></div>
+        <div class="logo-card" data-cat="건설"><div class="lc-icon">🏗️</div><div class="lc-name">정조건설(주)</div><div class="lc-type">건설·건축</div></div>
+        <div class="logo-card" data-cat="제조"><div class="lc-icon">🏭</div><div class="lc-name">기흥산업(주)</div><div class="lc-type">제조·생산</div></div>
+        <div class="logo-card" data-cat="물류"><div class="lc-icon">🚛</div><div class="lc-name">수원종합물류</div><div class="lc-type">물류·운송</div></div>
+        <div class="logo-card" data-cat="서비스"><div class="lc-icon">🏢</div><div class="lc-name">팔달유통(주)</div><div class="lc-type">서비스</div></div>
+      </div>
+    </div>
+    <div class="client-stats-row">
+      <div class="cstat"><span class="cs-num">540+</span><span class="cs-label">전체 거래처</span></div>
+      <div class="cstat-divider"></div>
+      <div class="cstat"><span class="cs-num">5년+</span><span class="cs-label">최장 거래 기간</span></div>
+      <div class="cstat-divider"></div>
+      <div class="cstat"><span class="cs-num">98%</span><span class="cs-label">재계약률</span></div>
+      <div class="cstat-divider"></div>
+      <div class="cstat"><span class="cs-num">수도권</span><span class="cs-label">전역 서비스</span></div>
+    </div>
+  </section>
+
+  <!-- ── 채용 공고 게시판 ── -->
+  <section id="jobs" class="jobs-section">
+    <div class="section-header">
+      <div class="section-badge">JOBS</div>
+      <h2 class="section-title">채용 공고</h2>
+      <p class="section-sub">브릿지웍스가 연결하는 일자리를 확인하세요</p>
+    </div>
+    <div class="jobs-filter-bar">
+      <div class="jf-search">
+        <span>🔍</span>
+        <input type="text" id="jobSearch" placeholder="직종, 지역, 업체명 검색..." oninput="filterJobs()">
+      </div>
+      <select class="jf-select" id="jobCatFilter" onchange="filterJobs()">
+        <option value="">전체 직종</option>
+        <option value="청소">🧹 청소용역</option>
+        <option value="생산">🏭 생산·제조</option>
+        <option value="물류">🚛 물류·배송</option>
+        <option value="건설">🏗️ 건설·건축</option>
+        <option value="경비">🔒 경비·보안</option>
+        <option value="기타">📋 기타</option>
+      </select>
+      <select class="jf-select" id="jobRegionFilter" onchange="filterJobs()">
+        <option value="">전체 지역</option>
+        <option value="수원">수원시</option>
+        <option value="화성">화성시</option>
+        <option value="용인">용인시</option>
+        <option value="안양">안양시</option>
+      </select>
+      <select class="jf-select" id="jobTypeFilter" onchange="filterJobs()">
+        <option value="">고용형태</option>
+        <option value="일용직">일용직</option>
+        <option value="단기">단기계약</option>
+        <option value="장기">장기계약</option>
+        <option value="파견">파견직</option>
+      </select>
+    </div>
+    <div class="jobs-grid" id="jobsGrid">
+      <div class="job-card" data-cat="청소" data-region="수원" data-type="일용직">
+        <div class="jc-top">
+          <div class="jc-badges"><span class="jc-badge urgent">🔥 급구</span><span class="jc-badge type">일용직</span></div>
+          <div class="jc-date">2026.02.20</div>
+        </div>
+        <div class="jc-title">아파트 청소용역 일용직 모집</div>
+        <div class="jc-company">🏢 수원 권선구 소재 아파트 단지</div>
+        <div class="jc-info-row">
+          <span>📍 수원시 권선구</span><span>💰 일당 130,000원~</span><span>👤 5명 모집</span>
+        </div>
+        <div class="jc-tags"><span class="jc-tag">🧹 청소용역</span><span class="jc-tag">주5일</span><span class="jc-tag">남녀무관</span></div>
+        <button class="jc-apply-btn" onclick="applyJob(this,'아파트 청소용역 일용직')">지원 신청</button>
+      </div>
+      <div class="job-card" data-cat="생산" data-region="화성" data-type="파견">
+        <div class="jc-top">
+          <div class="jc-badges"><span class="jc-badge type">파견직</span><span class="jc-badge long">장기</span></div>
+          <div class="jc-date">2026.02.18</div>
+        </div>
+        <div class="jc-title">제조공장 생산직 파견 (3개월↑)</div>
+        <div class="jc-company">🏭 화성시 소재 전자부품 제조업체</div>
+        <div class="jc-info-row">
+          <span>📍 화성시 향남읍</span><span>💰 월 220만원~</span><span>👤 10명 모집</span>
+        </div>
+        <div class="jc-tags"><span class="jc-tag">🏭 생산·조립</span><span class="jc-tag">주5일(2교대)</span><span class="jc-tag">4대보험</span></div>
+        <button class="jc-apply-btn" onclick="applyJob(this,'제조공장 생산직 파견')">지원 신청</button>
+      </div>
+      <div class="job-card" data-cat="물류" data-region="수원" data-type="단기">
+        <div class="jc-top">
+          <div class="jc-badges"><span class="jc-badge urgent">🔥 급구</span><span class="jc-badge type">단기계약</span></div>
+          <div class="jc-date">2026.02.17</div>
+        </div>
+        <div class="jc-title">물류창고 상하차 작업자</div>
+        <div class="jc-company">🚛 수원 팔달구 물류센터</div>
+        <div class="jc-info-row">
+          <span>📍 수원시 팔달구</span><span>💰 일당 140,000원~</span><span>👤 8명 모집</span>
+        </div>
+        <div class="jc-tags"><span class="jc-tag">🚛 물류</span><span class="jc-tag">주6일</span><span class="jc-tag">체력우대</span></div>
+        <button class="jc-apply-btn" onclick="applyJob(this,'물류창고 상하차 작업자')">지원 신청</button>
+      </div>
+      <div class="job-card" data-cat="건설" data-region="용인" data-type="일용직">
+        <div class="jc-top">
+          <div class="jc-badges"><span class="jc-badge type">일용직</span></div>
+          <div class="jc-date">2026.02.15</div>
+        </div>
+        <div class="jc-title">건설현장 일반공 / 잡부</div>
+        <div class="jc-company">🏗️ 용인시 기흥구 신축현장</div>
+        <div class="jc-info-row">
+          <span>📍 용인시 기흥구</span><span>💰 일당 150,000원~</span><span>👤 15명 모집</span>
+        </div>
+        <div class="jc-tags"><span class="jc-tag">🏗️ 건설</span><span class="jc-tag">남성우대</span><span class="jc-tag">경험자우대</span></div>
+        <button class="jc-apply-btn" onclick="applyJob(this,'건설현장 일반공')">지원 신청</button>
+      </div>
+      <div class="job-card" data-cat="경비" data-region="수원" data-type="장기">
+        <div class="jc-top">
+          <div class="jc-badges"><span class="jc-badge long">장기</span><span class="jc-badge type">파견직</span></div>
+          <div class="jc-date">2026.02.14</div>
+        </div>
+        <div class="jc-title">아파트 단지 경비원 (장기)</div>
+        <div class="jc-company">🔒 수원시 권선구 대단지 아파트</div>
+        <div class="jc-info-row">
+          <span>📍 수원시 권선구</span><span>💰 월 230만원~</span><span>👤 2명 모집</span>
+        </div>
+        <div class="jc-tags"><span class="jc-tag">🔒 경비</span><span class="jc-tag">주야 2교대</span><span class="jc-tag">4대보험</span></div>
+        <button class="jc-apply-btn" onclick="applyJob(this,'아파트 단지 경비원')">지원 신청</button>
+      </div>
+      <div class="job-card" data-cat="청소" data-region="화성" data-type="장기">
+        <div class="jc-top">
+          <div class="jc-badges"><span class="jc-badge long">장기</span><span class="jc-badge type">파견직</span></div>
+          <div class="jc-date">2026.02.12</div>
+        </div>
+        <div class="jc-title">사무실·공장 정기청소 전담 (장기)</div>
+        <div class="jc-company">🧹 화성시 동탄 소재 기업</div>
+        <div class="jc-info-row">
+          <span>📍 화성시 동탄</span><span>💰 월 200만원~</span><span>👤 3명 모집</span>
+        </div>
+        <div class="jc-tags"><span class="jc-tag">🧹 청소용역</span><span class="jc-tag">주5일</span><span class="jc-tag">여성가능</span></div>
+        <button class="jc-apply-btn" onclick="applyJob(this,'사무실 정기청소 전담')">지원 신청</button>
+      </div>
+    </div>
+    <div class="jobs-empty hidden" id="jobsEmpty">😔 검색 결과가 없습니다. 다른 조건으로 검색해보세요.</div>
+    <div style="text-align:center;margin-top:32px">
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:12px">원하는 공고가 없으신가요? 구직 신청을 남겨주시면 맞춤 매칭해드립니다.</p>
+      <a class="btn btn-gold btn-lg" href="#contact" onclick="navScroll(event,'contact')">📝 구직 신청하기</a>
+    </div>
+  </section>
+
+  <!-- ── 이용 프로세스 ── -->
+  <section id="process" class="process-section">
+    <div class="section-header">
+      <div class="section-badge">PROCESS</div>
+      <h2 class="section-title">이용 절차</h2>
+      <p class="section-sub">간편하게 인력을 요청하세요</p>
+    </div>
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="ps-circle">📞</div>
+        <div class="ps-connector"></div>
+        <div class="ps-title">상담 신청</div>
+        <div class="ps-desc">전화 또는 온라인으로 인력 요청</div>
+      </div>
+      <div class="process-step">
+        <div class="ps-circle">🔍</div>
+        <div class="ps-connector"></div>
+        <div class="ps-title">인력 매칭</div>
+        <div class="ps-desc">보유 인력 중 최적 매칭</div>
+      </div>
+      <div class="process-step">
+        <div class="ps-circle">📋</div>
+        <div class="ps-connector"></div>
+        <div class="ps-title">계약 체결</div>
+        <div class="ps-desc">근로계약·파견계약 체결</div>
+      </div>
+      <div class="process-step">
+        <div class="ps-circle">🚀</div>
+        <div class="ps-connector"></div>
+        <div class="ps-title">인력 투입</div>
+        <div class="ps-desc">즉시 현장 배치 가능</div>
+      </div>
+      <div class="process-step last">
+        <div class="ps-circle">✅</div>
+        <div class="ps-title">사후 관리</div>
+        <div class="ps-desc">지속적인 모니터링</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 카카오맵 위치 섹션 ── -->
+  <section id="location" class="location-section">
+    <div class="section-header">
+      <div class="section-badge">LOCATION</div>
+      <h2 class="section-title">오시는 길</h2>
+      <p class="section-sub">경기도 수원시 권선구 정조로 458, 301호</p>
+    </div>
+    <div class="location-container">
+      <!-- 지도 영역 -->
+      <div class="map-wrapper">
+        <div id="kakaoMap" class="kakao-map-box">
+          <!-- 카카오 API 키 미설정 시 대체 표시 -->
+          <div class="map-fallback" id="mapFallback">
+            <div class="mf-icon">📍</div>
+            <div class="mf-addr">경기도 수원시 권선구 정조로 458, 301호</div>
+            <a class="mf-btn" href="https://map.kakao.com/link/search/경기도 수원시 권선구 정조로 458" target="_blank">
+              카카오맵으로 보기 →
+            </a>
+            <a class="mf-btn mf-btn-naver" href="https://map.naver.com/v5/search/경기도 수원시 권선구 정조로 458" target="_blank">
+              네이버지도로 보기 →
+            </a>
+          </div>
+        </div>
+        <!-- 지도 하단 바로가기 버튼 -->
+        <div class="map-actions">
+          <a class="map-action-btn kakao" href="https://map.kakao.com/link/search/브릿지웍스 수원시 권선구 정조로 458" target="_blank">
+            🗺️ 카카오맵
+          </a>
+          <a class="map-action-btn naver" href="https://map.naver.com/v5/search/경기도 수원시 권선구 정조로 458" target="_blank">
+            🗺️ 네이버지도
+          </a>
+          <a class="map-action-btn google" href="https://www.google.com/maps/search/경기도+수원시+권선구+정조로+458" target="_blank">
+            🗺️ 구글지도
+          </a>
+        </div>
+      </div>
+      <!-- 주소 정보 -->
+      <div class="location-info">
+        <div class="li-card">
+          <div class="li-title">📍 주소</div>
+          <div class="li-content">경기도 수원시 권선구 정조로 458, 301호 (세류동)</div>
+        </div>
+        <div class="li-card">
+          <div class="li-title">🚌 대중교통</div>
+          <div class="li-content">
+            <div class="li-row"><span class="li-badge bus">버스</span> 수원역 환승 → 정조로 방면</div>
+            <div class="li-row"><span class="li-badge subway">지하철</span> 1호선 수원역 하차 후 버스 환승</div>
+          </div>
+        </div>
+        <div class="li-card">
+          <div class="li-title">🚗 자가용</div>
+          <div class="li-content">수원IC → 권선구청 방면 → 정조로 진입</div>
+        </div>
+        <div class="li-card">
+          <div class="li-title">🅿️ 주차</div>
+          <div class="li-content">건물 내 주차 가능 (방문 전 연락 권장)</div>
+        </div>
+        <div class="li-card li-card-highlight">
+          <div class="li-title">⏰ 운영시간</div>
+          <div class="li-content">
+            <div>평일: 09:00 ~ 18:00</div>
+            <div>토요일: 09:00 ~ 13:00</div>
+            <div style="color:var(--gold);font-weight:700">긴급 인력 요청: 24시간</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 문의 섹션 ── -->
+  <section class="contact-section" id="contact">
+    <div class="section-header">
+      <div class="section-badge">CONTACT</div>
+      <h2 class="section-title">문의 및 신청</h2>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-form-card">
+        <h3 style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:20px">📝 구인/구직 신청</h3>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <button class="btn btn-primary" style="flex:1" id="tabHire" onclick="switchContactTab('hire')">구인 신청</button>
+          <button class="btn btn-outline" style="flex:1" id="tabSeek" onclick="switchContactTab('seek')">구직 신청</button>
+        </div>
+        <div class="form-grid cols-1" style="gap:12px">
+          <div class="form-field">
+            <label class="form-label" id="contactNameLabel">업체명</label>
+            <input class="form-input" id="contactName" placeholder="업체명 또는 이름">
+          </div>
+          <div class="form-field">
+            <label class="form-label">연락처</label>
+            <input class="form-input" id="contactPhone" placeholder="010-0000-0000" oninput="formatPhone(this)">
+          </div>
+          <div class="form-field">
+            <label class="form-label">업종/직종</label>
+            <input class="form-input" id="contactJob" placeholder="예: 청소용역, 생산직, 경비">
+          </div>
+          <div class="form-field">
+            <label class="form-label">문의 내용</label>
+            <textarea class="form-textarea" id="contactMsg" rows="4" placeholder="필요 인원, 기간, 지역 등을 적어주세요"></textarea>
+          </div>
+          <!-- 파일 첨부 (구직 신청 시 표시) -->
+          <div class="form-field" id="fileUploadSection" style="display:none">
+            <label class="form-label">📎 파일 첨부 <span style="color:var(--gray-400);font-weight:400">(이력서·신분증, 최대 10MB)</span></label>
+            <div class="file-drop-area" id="fileDropArea" onclick="document.getElementById('resumeFile').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleFileDrop(event)">
+              <div class="file-drop-icon">📄</div>
+              <div class="file-drop-text">클릭하거나 파일을 끌어다 놓으세요</div>
+              <div class="file-drop-hint">PDF, JPG, PNG, HWP, DOC — 최대 10MB</div>
+              <input type="file" id="resumeFile" multiple accept=".pdf,.jpg,.jpeg,.png,.hwp,.doc,.docx" style="display:none" onchange="handleFileSelect(this.files)">
+            </div>
+            <div id="fileList" style="margin-top:8px"></div>
+          </div>
+        </div>
+        <!-- 발송 상태 표시 -->
+        <div id="submitStatus" class="submit-status hidden"></div>
+        <button class="btn btn-gold" id="submitBtn" style="width:100%;margin-top:16px;padding:14px;font-size:14px" onclick="submitContact()">
+          📨 신청하기
+        </button>
+        <div style="margin-top:8px;font-size:11px;color:var(--gray-500);text-align:center">
+          📬 신청 즉시 관리자에게 카카오톡 알림이 전송됩니다
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-body">
+            <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:16px">📍 연락처</div>
+            <div style="line-height:2.2;font-size:13px">
+              <div><strong>회사명</strong>: 브릿지웍스 주식회사</div>
+              <div><strong>대표자</strong>: 박재관</div>
+              <div><strong>주소</strong>: 경기도 수원시 권선구 정조로 458, 301호</div>
+              <div><strong>사업자번호</strong>: 841-86-03358</div>
+              <div><strong>파견허가</strong>: 2025-23호</div>
+              <div style="margin-top:8px"><strong style="color:var(--gold-dark)">📞 전화: 연락처 등록 예정</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="background:linear-gradient(135deg,var(--navy),var(--navy-light));color:white;margin-bottom:16px">
+          <div class="card-body">
+            <div style="font-size:14px;font-weight:800;color:var(--gold-light);margin-bottom:12px">⚡ 긴급 인력 요청</div>
+            <p style="font-size:12px;opacity:0.8;line-height:1.8">당일·익일 급한 인력이 필요하신가요?<br>등록된 3,742명의 인력 풀에서 즉시 매칭해드립니다.</p>
+            <div style="margin-top:16px;font-size:20px;font-weight:900;color:var(--gold)">24시간 긴급 대응</div>
+          </div>
+        </div>
+        <!-- 카카오 알림 설정 카드 -->
+        <div class="card kakao-setup-card">
+          <div class="card-body">
+            <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px">🔔 카카오톡 알림 설정</div>
+            <div style="font-size:11px;color:var(--gray-500);margin-bottom:12px">관리자로 카카오 로그인하면<br>신청 접수 시 즉시 카카오톡 알림을 받습니다</div>
+            <div id="kakaoLoginStatus2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 카카오 플로팅 버튼 ── -->
+  <div class="kakao-float" id="kakaoFloat">
+    <button class="kakao-float-btn" onclick="toggleKakaoMenu()" title="카카오 상담">💬</button>
+    <div class="kakao-tooltip" id="kakaoTooltip">
+      <div class="kt-arrow"></div>
+      <div class="kt-title">💬 카카오 채널 상담</div>
+      <div class="kt-desc">평일 09:00 ~ 18:00<br>긴급 문의는 24시간 가능</div>
+      <a class="kt-btn" href="https://pf.kakao.com/_YOUR_CHANNEL" target="_blank" onclick="closeKakaoMenu()">채널 바로가기 →</a>
+      <a class="kt-btn kt-btn-outline" href="#contact" onclick="navScroll(event,'contact');closeKakaoMenu()">구인/구직 신청</a>
+    </div>
+  </div>
+
+  <!-- ── 푸터 ── -->
+  <footer class="site-footer">
+    <div>
+      <strong>브릿지웍스 주식회사</strong> &nbsp;|&nbsp;
+      대표이사: 박재관 &nbsp;|&nbsp;
+      사업자등록번호: 841-86-03358 &nbsp;|&nbsp;
+      근로자파견사업허가: 2025-23
+    </div>
+    <div>경기도 수원시 권선구 정조로 458, 301호(세류동)</div>
+    <div style="margin-top:8px">© 2025 BridgeWorks Co., Ltd. All rights reserved.</div>
+  </footer>
+</div><!-- /#websitePage -->
+
+
+<!-- ===================================================
+     스크립트 로드
+     =================================================== -->
+
+
+<script>
+/* ────────────────────────────────────────────────────
+   홈페이지 공통 유틸
+   ──────────────────────────────────────────────────── */
+
+// 홈페이지 열기/닫기
+function openWebsite() {
+  document.getElementById('websitePage').classList.remove('hidden');
+  document.getElementById('appPage').classList.add('hidden');
+  initKakaoMap();
+  startCountUpAll();
+}
+function closeWebsite() {
+  document.getElementById('websitePage').classList.add('hidden');
+  document.getElementById('appPage').classList.remove('hidden');
+  closeMobileNav();
+}
+
+// 스크롤 네비게이션 (websitePage 내부 스크롤)
+function navScroll(e, id) {
+  e && e.preventDefault();
+  const page = document.getElementById('websitePage');
+  const el   = document.getElementById(id);
+  if (!el || !page) return;
+  const offset = el.getBoundingClientRect().top + page.scrollTop - 70;
+  page.scrollTo({ top: offset, behavior: 'smooth' });
+}
+
+/* ────────────────────────────────────────────────────
+   모바일 햄버거 메뉴
+   ──────────────────────────────────────────────────── */
+function toggleMobileNav() {
+  const drawer  = document.getElementById('mobileNavDrawer');
+  const overlay = document.getElementById('mobileNavOverlay');
+  const btn     = document.getElementById('hamburgerBtn');
+  const isOpen  = drawer.classList.contains('open');
+  if (isOpen) { closeMobileNav(); }
+  else {
+    drawer.classList.add('open');
+    overlay.classList.add('show');
+    btn.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+function closeMobileNav() {
+  document.getElementById('mobileNavDrawer').classList.remove('open');
+  document.getElementById('mobileNavOverlay').classList.remove('show');
+  document.getElementById('hamburgerBtn').classList.remove('active');
+  document.body.style.overflow = '';
+}
+function mobileNavGo(id) {
+  closeMobileNav();
+  setTimeout(() => navScroll(null, id), 300);
+}
+
+// 스크롤 시 네비 투명도 + 활성 링크
+(function() {
+  const page = document.getElementById('websitePage');
+  if (!page) return;
+  page.addEventListener('scroll', function() {
+    const nav = document.getElementById('websiteNav');
+    if (!nav) return;
+    nav.classList.toggle('scrolled', page.scrollTop > 60);
+    // 활성 섹션 표시
+    const sections = ['home','about','services','clients','jobs','process','location','contact'];
+    let current = 'home';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top - 80 <= 0) current = id;
+    });
+    document.querySelectorAll('.website-nav-links a').forEach(a => {
+      const href = a.getAttribute('href').replace('#','');
+      a.classList.toggle('active', href === current);
+    });
+  });
+})();
+
+/* ────────────────────────────────────────────────────
+   카카오맵 초기화
+   ──────────────────────────────────────────────────── */
+let _mapInited = false;
+function initKakaoMap() {
+  if (_mapInited) return;
+  if (!window.kakao || !window.kakao.maps) {
+    // API 키 미설정 → fallback 표시
+    document.getElementById('mapFallback').style.display = 'flex';
+    return;
+  }
+  _mapInited = true;
+  document.getElementById('mapFallback').style.display = 'none';
+
+  const container = document.getElementById('kakaoMap');
+  const options = {
+    center: new kakao.maps.LatLng(37.2532, 127.0182), // 수원시 권선구 정조로
+    level: 3
+  };
+  const map = new kakao.maps.Map(container, options);
+
+  // 커스텀 마커
+  const markerPos = new kakao.maps.LatLng(37.2532, 127.0182);
+  const marker    = new kakao.maps.Marker({ position: markerPos });
+  marker.setMap(map);
+
+  // 인포윈도우
+  const infoContent = `
+    <div style="padding:12px 16px;font-family:'Noto Sans KR',sans-serif;min-width:220px">
+      <div style="font-size:14px;font-weight:800;color:#0a1f44;margin-bottom:4px">🏢 브릿지웍스 주식회사</div>
+      <div style="font-size:12px;color:#7a8aaa;line-height:1.7">
+        경기도 수원시 권선구 정조로 458, 301호<br>
+        사업자: 841-86-03358<br>
+        <a href="https://map.kakao.com/link/to/브릿지웍스,37.2532,127.0182" target="_blank"
+           style="color:#c9a84c;font-weight:700">길찾기 →</a>
+      </div>
+    </div>`;
+  const infowindow = new kakao.maps.InfoWindow({ content: infoContent });
+  infowindow.open(map, marker);
+
+  // 마커 클릭 시 인포윈도우 토글
+  kakao.maps.event.addListener(marker, 'click', function() {
+    infowindow.open(map, marker);
+  });
+
+  // 지도 컨트롤
+  map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+  map.addControl(new kakao.maps.MapTypeControl(), kakao.maps.ControlPosition.TOPRIGHT);
+}
+
+/* ────────────────────────────────────────────────────
+   숫자 카운트업 애니메이션
+   ──────────────────────────────────────────────────── */
+function countUp(el, target, duration) {
+  let start = 0, step = target / (duration / 16);
+  const t = setInterval(() => {
+    start = Math.min(start + step, target);
+    el.textContent = Math.floor(start).toLocaleString() + '+';
+    if (start >= target) clearInterval(t);
+  }, 16);
+}
+function startCountUpAll() {
+  document.querySelectorAll('[data-count]').forEach(el => {
+    countUp(el, parseInt(el.dataset.count), 1500);
+  });
+}
+
+/* ────────────────────────────────────────────────────
+   문의 폼
+   ──────────────────────────────────────────────────── */
+let _contactType = '구인';
+function switchContactTab(tab) {
+  const isHire = tab === 'hire';
+  _contactType = isHire ? '구인' : '구직';
+  document.getElementById('tabHire').className = isHire ? 'btn btn-primary' : 'btn btn-outline';
+  document.getElementById('tabSeek').className = isHire ? 'btn btn-outline' : 'btn btn-primary';
+  document.getElementById('contactNameLabel').textContent = isHire ? '업체명' : '이름';
+  document.getElementById('contactName').placeholder = isHire ? '업체명' : '이름';
+}
+
+function formatPhone(input) {
+  let v = input.value.replace(/\D/g,'');
+  if (v.length <= 3) input.value = v;
+  else if (v.length <= 7) input.value = v.slice(0,3) + '-' + v.slice(3);
+  else input.value = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7,11);
+}
+
+/* ── 파일 관련 ─── */
+let _selectedFiles = [];
+
+function handleFileSelect(fileList) {
+  _selectedFiles = [...fileList];
+  renderFileList();
+}
+function handleFileDrop(e) {
+  e.preventDefault();
+  document.getElementById('fileDropArea').classList.remove('drag');
+  _selectedFiles = [...e.dataTransfer.files];
+  renderFileList();
+}
+function renderFileList() {
+  const MAX = 10 * 1024 * 1024;
+  const container = document.getElementById('fileList');
+  container.innerHTML = _selectedFiles.map((f,i) => {
+    const oversize = f.size > MAX;
+    const size = (f.size/1024/1024).toFixed(1);
+    return `<div class="file-item ${oversize?'file-error':''}">
+      <span>📄 ${f.name} <span style="color:var(--gray-400)">(${size}MB)</span></span>
+      ${oversize ? '<span style="color:var(--red);font-size:11px">크기 초과</span>' : ''}
+      <button onclick="_selectedFiles.splice(${i},1);renderFileList()" style="background:none;border:none;cursor:pointer;color:var(--red)">✕</button>
+    </div>`;
+  }).join('');
+}
+
+async function submitContact() {
+  const name  = document.getElementById('contactName').value.trim();
+  const phone = document.getElementById('contactPhone').value.trim();
+  const job   = document.getElementById('contactJob').value.trim();
+  const msg   = document.getElementById('contactMsg').value.trim();
+
+  if (!name || !phone) {
+    showStatus('업체명/이름과 연락처를 입력해주세요.', 'error');
+    return;
+  }
+  if (phone.replace(/\D/g,'').length < 10) {
+    showStatus('올바른 연락처를 입력해주세요.', 'error');
+    return;
+  }
+
+  const MAX = 10 * 1024 * 1024;
+  const oversized = _selectedFiles.filter(f => f.size > MAX);
+  if (oversized.length > 0) {
+    showStatus(`크기 초과 파일 제거 후 다시 시도해주세요: ${oversized.map(f=>f.name).join(', ')}`, 'error');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+
+  const hasFiles = _selectedFiles.length > 0;
+  btn.textContent = hasFiles ? '⏳ 파일 업로드 중...' : '⏳ 전송 중...';
+  showStatus(hasFiles ? `파일 ${_selectedFiles.length}개를 업로드하고 신청을 접수합니다...` : '신청을 접수하고 있습니다...', 'info');
+
+  const data = {
+    type: _contactType, name, phone, job, msg,
+    files: _selectedFiles.map(f => ({ name: f.name }))
+  };
+
+  try {
+    const result = await BW_NOTIFY.send(data, _selectedFiles);
+
+    showStatus('✅ 신청이 접수되었습니다! 빠른 시간 내 연락드리겠습니다.' +
+      (hasFiles ? ` (파일 ${_selectedFiles.length}개 전송 완료)` : ''), 'success');
+
+    // 폼 초기화
+    document.getElementById('contactName').value = '';
+    document.getElementById('contactPhone').value = '';
+    document.getElementById('contactJob').value = '';
+    document.getElementById('contactMsg').value = '';
+    _selectedFiles = [];
+    renderFileList();
+    btn.textContent = '✅ 신청완료';
+    setTimeout(() => { btn.disabled = false; btn.textContent = '📨 신청하기'; }, 5000);
+
+  } catch(e) {
+    showStatus('전송 중 오류가 발생했습니다. 직접 전화로 문의해주세요.', 'error');
+    btn.disabled = false;
+    btn.textContent = '📨 신청하기';
+  }
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('submitStatus');
+  el.textContent = msg;
+  el.className = 'submit-status show ' + type;
+}
+
+/* ────────────────────────────────────────────────────
+   고객사 필터
+   ──────────────────────────────────────────────────── */
+function filterClients(cat, btn) {
+  document.querySelectorAll('.client-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.logo-card').forEach(card => {
+    card.style.display = (cat === 'all' || card.dataset.cat === cat) ? 'flex' : 'none';
+  });
+}
+
+/* ────────────────────────────────────────────────────
+   채용 공고 필터
+   ──────────────────────────────────────────────────── */
+function filterJobs() {
+  const kw     = (document.getElementById('jobSearch').value || '').toLowerCase();
+  const cat    = document.getElementById('jobCatFilter').value;
+  const region = document.getElementById('jobRegionFilter').value;
+  const type   = document.getElementById('jobTypeFilter').value;
+  let visible  = 0;
+  document.querySelectorAll('#jobsGrid .job-card').forEach(card => {
+    const txt   = card.textContent.toLowerCase();
+    const show  = (!kw || txt.includes(kw)) &&
+                  (!cat    || card.dataset.cat.includes(cat)) &&
+                  (!region || card.dataset.region.includes(region)) &&
+                  (!type   || card.dataset.type.includes(type));
+    card.style.display = show ? 'flex' : 'none';
+    if (show) visible++;
+  });
+  document.getElementById('jobsEmpty').classList.toggle('hidden', visible > 0);
+}
+
+function applyJob(btn, title) {
+  btn.textContent = '✅ 신청완료';
+  btn.disabled = true;
+  btn.style.background = 'var(--green)';
+  // 카카오 알림 발송
+  BW_NOTIFY.send({ type: '구직(채용공고)', name: '홈페이지 방문자', phone: '-', job: title, msg: '채용공고 지원' });
+  if (typeof Toast !== 'undefined') Toast.show(`[${title}] 지원 신청이 접수되었습니다!`, 'success', 4000);
+}
+
+/* ────────────────────────────────────────────────────
+   카카오 플로팅
+   ──────────────────────────────────────────────────── */
+function toggleKakaoMenu() {
+  document.getElementById('kakaoTooltip').classList.toggle('show');
+}
+function closeKakaoMenu() {
+  document.getElementById('kakaoTooltip').classList.remove('show');
+}
+document.addEventListener('click', function(e) {
+  const f = document.getElementById('kakaoFloat');
+  if (f && !f.contains(e.target)) closeKakaoMenu();
+});
+
+/* ────────────────────────────────────────────────────
+   카카오 로그인 상태 양쪽 카드에 동기화
+   ──────────────────────────────────────────────────── */
+const _origUpdate = BW_NOTIFY.updateKakaoStatus.bind(BW_NOTIFY);
+function syncKakaoStatus() {
+  const token = localStorage.getItem('bw_kakao_token');
+  const exp   = parseInt(localStorage.getItem('bw_kakao_token_exp') || '0');
+  const valid  = token && Date.now() < exp;
+  ['kakaoLoginStatus','kakaoLoginStatus2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = valid
+      ? `<span class="kls-on">🟢 카카오 알림 활성</span> <button class="btn btn-sm btn-outline" onclick="BW_NOTIFY.kakaoAdminLogout();syncKakaoStatus()">해제</button>`
+      : `<span class="kls-off">🔴 카카오 알림 비활성</span><br><button class="btn btn-sm btn-gold" style="margin-top:8px" onclick="BW_NOTIFY.kakaoAdminLogin();setTimeout(syncKakaoStatus,2000)">카카오 로그인</button>`;
+  });
+}
+document.addEventListener('DOMContentLoaded', syncKakaoStatus);
+</script>
+
+<script>
+/* ============================================
+   브릿지웍스 통합 플랫폼 - 메인 JavaScript
+   ============================================ */
+
+'use strict';
+
+// ============ 전역 상태 ============
+const App = {
+  currentPage: 'dashboard',
+  currentUser: null,
+  data: {
+    workers: [],      // 노무자
+    clients: [],      // 거래처
+    ledger: [],       // 금전출납
+    jobSeek: [],      // 구직대장
+    jobOffer: [],     // 구인대장
+  },
+  pagination: { page: 1, limit: 20 },
+};
+
+// ============ 유틸리티 ============
+const Utils = {
+  formatNum(n) {
+    if (n == null || n === '') return '-';
+    return Number(n).toLocaleString('ko-KR');
+  },
+  formatMoney(n) {
+    if (n == null || n === '') return '-';
+    return Number(n).toLocaleString('ko-KR') + '원';
+  },
+  formatDate(d) {
+    if (!d) return '-';
+    return String(d).slice(0, 10);
+  },
+  today() {
+    return new Date().toISOString().slice(0, 10);
+  },
+  thisMonth() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  },
+  maskSSN(ssn) {
+    if (!ssn) return '-';
+    const s = String(ssn).replace(/-/g, '');
+    if (s.length >= 7) return s.slice(0,6) + '-' + s[6] + '******';
+    return ssn;
+  },
+  maskPhone(phone) {
+    if (!phone) return '-';
+    return String(phone).replace(/(\d{3})-?(\d{3,4})-?(\d{4})/, '$1-****-$3');
+  },
+  ageFromSSN(ssn) {
+    if (!ssn) return '-';
+    const s = String(ssn).replace(/-/g, '');
+    const yy = parseInt(s.slice(0,2));
+    const gender = parseInt(s[6]);
+    const year = (gender <= 2) ? 1900+yy : 2000+yy;
+    return new Date().getFullYear() - year;
+  },
+  genderFromSSN(ssn) {
+    if (!ssn) return '-';
+    const s = String(ssn).replace(/-/g, '');
+    const g = parseInt(s[6]);
+    return (g === 1 || g === 3 || g === 5) ? '남' : '여';
+  },
+  // 세금 계산 (2026년 기준)
+  calcTax(dayWage, workDays) {
+    const total = dayWage * workDays;
+    if (workDays <= 7) {
+      // 7일 이하
+      const incomeBase = Math.max(0, total - 150000 * workDays);
+      const incomeTax = Math.floor(incomeBase * 0.06 * 0.45);
+      const localTax  = Math.floor(incomeTax * 0.1);
+      const empIns    = Math.floor(total * 0.009);
+      return {
+        total, incomeTax, localTax, empIns,
+        healthIns: 0, longCare: 0, pension: 0,
+        totalDeduct: incomeTax + localTax + empIns,
+        net: total - incomeTax - localTax - empIns,
+        type: '7일이하'
+      };
+    } else {
+      // 8일 이상
+      const incomeBase = Math.max(0, total - 150000 * workDays);
+      const incomeTax = Math.floor(incomeBase * 0.06 * 0.45);
+      const localTax  = Math.floor(incomeTax * 0.1);
+      const empIns    = Math.floor(total * 0.009);
+      const healthIns = Math.floor(total * 0.03545);
+      const longCare  = Math.floor(healthIns * 0.1295);
+      const pension   = Math.floor(total * 0.045);
+      const totalDeduct = incomeTax + localTax + empIns + healthIns + longCare + pension;
+      return {
+        total, incomeTax, localTax, empIns,
+        healthIns, longCare, pension,
+        totalDeduct, net: total - totalDeduct,
+        type: '8일이상'
+      };
+    }
+  },
+  genId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2);
+  },
+  debounce(fn, ms) {
+    let t;
+    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  },
+};
+
+// ============ 스토리지 (LocalStorage) ============
+const Store = {
+  save(key, data) {
+    try { localStorage.setItem('bw_' + key, JSON.stringify(data)); } catch(e) {}
+  },
+  load(key, def = []) {
+    try {
+      const v = localStorage.getItem('bw_' + key);
+      return v ? JSON.parse(v) : def;
+    } catch(e) { return def; }
+  },
+  init() {
+    App.data.workers = Store.load('workers', SAMPLE_DATA.workers);
+    App.data.clients = Store.load('clients', SAMPLE_DATA.clients);
+    App.data.ledger  = Store.load('ledger',  SAMPLE_DATA.ledger);
+    App.data.jobSeek = Store.load('jobSeek', []);
+    App.data.jobOffer= Store.load('jobOffer', []);
+  },
+};
+
+// ============ 샘플 데이터 ============
+const SAMPLE_DATA = {
+  workers: [
+    { id:'W001', name:'김민수', ssn:'850315-1234567', phone:'010-1234-5678', addr:'수원시 권선구 정조로 123', job:'청소용역', credit:'C', status:'구직중', memo:'성실함', regDate:'2024-03-15' },
+    { id:'W002', name:'이영희', ssn:'901122-2345678', phone:'010-2345-6789', addr:'수원시 팔달구 매산로 45', job:'생산직', credit:'A', status:'배치중', memo:'', regDate:'2024-05-20' },
+    { id:'W003', name:'박철수', ssn:'780610-1456789', phone:'010-3456-7890', addr:'화성시 동탄대로 678', job:'일반노무', credit:'C', status:'구직중', memo:'건설현장 경력 10년', regDate:'2023-11-10' },
+    { id:'W004', name:'최지영', ssn:'950801-2567890', phone:'010-4567-8901', addr:'수원시 장안구 조원로 89', job:'사무보조', credit:'C', status:'비활성', memo:'', regDate:'2022-08-01' },
+    { id:'W005', name:'정대호', ssn:'820425-1678901', phone:'010-5678-9012', addr:'용인시 기흥구 강남로 56', job:'경비', credit:'C', status:'구직중', memo:'경비 자격증 보유', regDate:'2025-01-05' },
+  ],
+  clients: [
+    { id:'C001', name:'삼성전자 화성사업장', bizNo:'130-81-12345', type:'제조업', addr:'화성시 동탄대로 1234', contact:'김과장', phone1:'031-111-2222', email:'', memo:'대기업', status:'거래중', regDate:'2022-01-10' },
+    { id:'C002', name:'현대건설 수원현장', bizNo:'', type:'건설업', addr:'수원시 영통구 광교로 50', contact:'이부장', phone1:'031-222-3333', email:'', memo:'', status:'거래중', regDate:'2023-03-15' },
+    { id:'C003', name:'GS리테일 수원물류센터', bizNo:'220-81-34567', type:'유통업', addr:'수원시 권선구 산업로 200', contact:'박차장', phone1:'031-333-4444', email:'gs@gs.com', memo:'', status:'거래중', regDate:'2023-06-01' },
+    { id:'C004', name:'롯데마트 수원점', bizNo:'', type:'유통업', addr:'수원시 팔달구 중앙로 123', contact:'최대리', phone1:'031-444-5555', email:'', memo:'', status:'거래중', regDate:'2024-02-20' },
+    { id:'C005', name:'코스트코 광교점', bizNo:'116-81-77890', type:'유통업', addr:'수원시 영통구 광교중앙로 200', contact:'정팀장', phone1:'031-555-6666', email:'', memo:'', status:'거래중', regDate:'2024-04-10' },
+  ],
+  ledger: [
+    { id:'L001', date:'2026-02-03', worker:'김민수', client:'삼성전자 화성사업장', site:'화성사업장 1라인', job:'청소용역', dayWage:100000, days:22, fee:0.15, payment:1870000, payMemo:'계좌이체', income:330000, incomeMemo:'수수료 15%', regDate:'2026-02-03' },
+    { id:'L002', date:'2026-02-05', worker:'이영희', client:'현대건설 수원현장', site:'광교 아파트 현장', job:'생산직', dayWage:130000, days:20, fee:0.12, payment:2288000, payMemo:'계좌이체', income:312000, incomeMemo:'수수료 12%', regDate:'2026-02-05' },
+    { id:'L003', date:'2026-02-10', worker:'박철수', client:'GS리테일 수원물류센터', site:'물류창고 A동', job:'일반노무', dayWage:120000, days:18, fee:0.15, payment:1836000, payMemo:'현금', income:324000, incomeMemo:'수수료 15%', regDate:'2026-02-10' },
+    { id:'L004', date:'2026-02-15', worker:'정대호', client:'코스트코 광교점', site:'광교점 매장', job:'경비', dayWage:110000, days:25, fee:0.12, payment:2420000, payMemo:'계좌이체', income:330000, incomeMemo:'수수료 12%', regDate:'2026-02-15' },
+    { id:'L005', date:'2026-02-20', worker:'김민수', client:'롯데마트 수원점', site:'수원점 식품매장', job:'청소용역', dayWage:100000, days:15, fee:0.15, payment:1275000, payMemo:'계좌이체', income:225000, incomeMemo:'수수료 15%', regDate:'2026-02-20' },
+  ],
+};
+
+// ============ 토스트 알림 ============
+const Toast = {
+  show(msg, type='info', duration=3000) {
+    const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), duration);
+  },
+};
+
+// ============ 페이지 라우터 ============
+const Router = {
+  go(page, params={}) {
+    App.currentPage = page;
+    // 모든 nav-item 비활성화
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.page === page);
+    });
+    // 페이지 렌더
+    const container = document.getElementById('pageContent');
+    container.innerHTML = '';
+    const renderers = {
+      dashboard:  Pages.dashboard,
+      workers:    Pages.workers,
+      clients:    Pages.clients,
+      ledger:     Pages.ledger,
+      salary:     Pages.salary,
+      jobseek:    Pages.jobseek,
+      joboffer:   Pages.joboffer,
+      documents:  Pages.documents,
+      tax:        Pages.tax,
+      settings:   Pages.settings,
+      website:    Pages.website,
+    };
+    if (renderers[page]) renderers[page](container, params);
+    else container.innerHTML = `<div class="card card-body"><p>준비 중입니다.</p></div>`;
+    // 헤더 타이틀 업데이트
+    const titles = {
+      dashboard: '📊 대시보드', workers: '👷 노무자 관리',
+      clients: '🏢 거래처 관리', ledger: '💰 금전출납부',
+      salary: '🧮 급여 계산기', jobseek: '📋 구직대장',
+      joboffer: '📋 구인대장', documents: '📄 서류 출력',
+      tax: '🧾 세무 자료', settings: '⚙️ 설정', website: '🌐 홈페이지 미리보기',
+    };
+    document.getElementById('pageTitle').textContent = titles[page] || page;
+    document.getElementById('headerDate').textContent = new Date().toLocaleDateString('ko-KR', {year:'numeric',month:'long',day:'numeric',weekday:'short'});
+    window.scrollTo(0, 0);
+  },
+};
+
+// ============ 페이지 렌더러 ============
+const Pages = {
+
+  // ── 대시보드 ──
+  dashboard(container) {
+    const w = App.data.workers, c = App.data.clients, l = App.data.ledger;
+    const totalIncome = l.reduce((s,r) => s + (Number(r.income)||0), 0);
+    const totalPay    = l.reduce((s,r) => s + (Number(r.payment)||0), 0);
+    const activeW     = w.filter(x => x.status === '배치중').length;
+    const seekW       = w.filter(x => x.status === '구직중').length;
+
+    container.innerHTML = `
+      <!-- 빠른 메뉴 -->
+      <div class="quick-menu-grid">
+        <div class="quick-btn" onclick="Router.go('workers')"><div class="q-icon">👷</div><div class="q-label">노무자 등록</div></div>
+        <div class="quick-btn" onclick="Router.go('clients')"><div class="q-icon">🏢</div><div class="q-label">거래처 등록</div></div>
+        <div class="quick-btn" onclick="Router.go('ledger')"><div class="q-icon">💰</div><div class="q-label">출납 입력</div></div>
+        <div class="quick-btn" onclick="Router.go('salary')"><div class="q-icon">🧮</div><div class="q-label">급여 계산</div></div>
+      </div>
+
+      <!-- 통계 카드 -->
+      <div class="stats-grid">
+        <div class="stat-card navy">
+          <div class="stat-icon">👷</div>
+          <div><div class="stat-value">${Utils.formatNum(w.length)}</div><div class="stat-label">전체 노무자</div>
+          <div class="stat-change up">▲ 배치중 ${activeW}명</div></div>
+        </div>
+        <div class="stat-card gold">
+          <div class="stat-icon">🏢</div>
+          <div><div class="stat-value">${Utils.formatNum(c.length)}</div><div class="stat-label">전체 거래처</div>
+          <div class="stat-change up">▲ 거래중 ${c.filter(x=>x.status==='거래중').length}개</div></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">💵</div>
+          <div><div class="stat-value">${Utils.formatNum(Math.round(totalIncome/10000))}만</div><div class="stat-label">누적 수수료 수입</div>
+          <div class="stat-change up">▲ 이달 출납 ${l.length}건</div></div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon">📤</div>
+          <div><div class="stat-value">${Utils.formatNum(Math.round(totalPay/10000))}만</div><div class="stat-label">누적 지불액</div>
+          <div class="stat-change">구직중 ${seekW}명 대기</div></div>
+        </div>
+      </div>
+
+      <!-- 이달 잔액 현황 -->
+      <div class="balance-box mb-24">
+        <div class="balance-item"><div class="b-label">총 입금(수수료)</div><div class="b-value">${Utils.formatMoney(totalIncome)}</div></div>
+        <div class="balance-divider"></div>
+        <div class="balance-item"><div class="b-label">총 지불액</div><div class="b-value">${Utils.formatMoney(totalPay)}</div></div>
+        <div class="balance-divider"></div>
+        <div class="balance-item"><div class="b-label">순이익</div><div class="b-value" style="color:var(--gold-light)">${Utils.formatMoney(totalIncome - totalPay)}</div></div>
+        <div style="margin-left:auto">
+          <button class="btn btn-gold btn-sm" onclick="Router.go('ledger')">출납 관리 →</button>
+        </div>
+      </div>
+
+      <!-- 최근 출납 내역 + 노무자 현황 -->
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">💰 최근 출납 내역</span>
+            <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="Router.go('ledger')">전체보기</button>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead><tr><th>날짜</th><th>근로자</th><th>거래처</th><th>직종</th><th>지불액</th><th>수수료</th></tr></thead>
+              <tbody>
+                ${l.slice(-5).reverse().map(r=>`
+                  <tr>
+                    <td>${Utils.formatDate(r.date)}</td>
+                    <td><span class="cell-main">${r.worker}</span></td>
+                    <td>${r.client}</td>
+                    <td><span class="badge badge-navy">${r.job||'-'}</span></td>
+                    <td class="amount-negative text-right">${Utils.formatMoney(r.payment)}</td>
+                    <td class="amount-positive text-right">${Utils.formatMoney(r.income)}</td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">👷 노무자 상태</span></div>
+          <div class="card-body">
+            ${[['구직중','gold',seekW],['배치중','green',activeW],['비활성','gray',w.filter(x=>x.status==='비활성').length]].map(([s,c,n])=>`
+              <div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--gray-200)">
+                <span class="badge badge-${c}">${s}</span>
+                <span style="font-size:22px;font-weight:800;color:var(--navy)">${n}명</span>
+              </div>`).join('')}
+            <div class="flex-between mt-16">
+              <span style="font-size:13px;color:var(--gray-500)">전체</span>
+              <span style="font-size:22px;font-weight:800;color:var(--navy)">${w.length}명</span>
+            </div>
+            <button class="btn btn-primary btn-sm mt-16" style="width:100%" onclick="Router.go('workers')">노무자 관리 →</button>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  // ── 노무자 관리 ──
+  workers(container, params={}) {
+    let filtered = [...App.data.workers];
+    const search = params.search || '';
+    const statusF = params.status || '';
+    if (search) filtered = filtered.filter(w =>
+      w.name?.includes(search) || w.phone?.includes(search) || w.job?.includes(search) || w.addr?.includes(search));
+    if (statusF) filtered = filtered.filter(w => w.status === statusF);
+
+    const page = params.page || 1;
+    const limit = 15;
+    const total = filtered.length;
+    const pages = Math.ceil(total / limit);
+    const paged = filtered.slice((page-1)*limit, page*limit);
+
+    container.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">👷 노무자 관리</span>
+          <span class="badge badge-navy" style="margin-left:8px">${total}명</span>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button class="btn btn-gold btn-sm" onclick="Pages.openWorkerModal()">+ 노무자 등록</button>
+            <button class="btn btn-outline btn-sm" onclick="Pages.exportWorkers()">📥 엑셀 내보내기</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding-bottom:0">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" placeholder="이름, 전화번호, 직종, 주소 검색..." 
+                value="${search}"
+                oninput="Router.go('workers',{search:this.value,status:'${statusF}',page:1})">
+            </div>
+            <select class="filter-select" onchange="Router.go('workers',{search:'${search}',status:this.value,page:1})">
+              <option value="">전체 상태</option>
+              ${['구직중','배치중','비활성'].map(s=>`<option value="${s}" ${statusF===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead><tr><th>#</th><th>이름</th><th>성별/나이</th><th>전화번호</th><th>직종</th><th>신용도</th><th>상태</th><th>주소</th><th>등록일</th><th>관리</th></tr></thead>
+            <tbody>
+              ${paged.map((w,i)=>`
+                <tr>
+                  <td style="color:var(--gray-500)">${(page-1)*limit+i+1}</td>
+                  <td><span class="cell-main">${w.name}</span></td>
+                  <td>${Utils.genderFromSSN(w.ssn)} / ${Utils.ageFromSSN(w.ssn)}세</td>
+                  <td class="font-mono">${w.phone||'-'}</td>
+                  <td>${w.job||'-'}</td>
+                  <td><span class="badge ${w.credit==='A'?'badge-gold':w.credit==='E'?'badge-red':'badge-navy'}">${w.credit||'-'}</span></td>
+                  <td><span class="badge ${w.status==='배치중'?'badge-green':w.status==='구직중'?'badge-orange':'badge-gray'}">${w.status||'-'}</span></td>
+                  <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${w.addr||'-'}</td>
+                  <td>${Utils.formatDate(w.regDate)}</td>
+                  <td>
+                    <div class="flex gap-8">
+                      <button class="btn btn-outline btn-sm btn-icon" onclick="Pages.openWorkerModal('${w.id}')" title="수정">✏️</button>
+                      <button class="btn btn-danger btn-sm btn-icon" onclick="Pages.deleteWorker('${w.id}')" title="삭제">🗑️</button>
+                    </div>
+                  </td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div class="card-body">
+          <div class="flex-between">
+            <span style="font-size:12px;color:var(--gray-500)">총 ${total}명 중 ${(page-1)*limit+1}-${Math.min(page*limit,total)}명 표시</span>
+            <div class="pagination">
+              ${page>1?`<button class="page-btn" onclick="Router.go('workers',{search:'${search}',status:'${statusF}',page:${page-1}})">‹</button>`:''}
+              ${Array.from({length:Math.min(pages,7)},(_,i)=>{
+                const p = Math.max(1,page-3)+i;
+                if(p>pages) return '';
+                return `<button class="page-btn ${p===page?'active':''}" onclick="Router.go('workers',{search:'${search}',status:'${statusF}',page:${p}})">${p}</button>`;
+              }).join('')}
+              ${page<pages?`<button class="page-btn" onclick="Router.go('workers',{search:'${search}',status:'${statusF}',page:${page+1}})">›</button>`:''}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  // ── 거래처 관리 ──
+  clients(container, params={}) {
+    let filtered = [...App.data.clients];
+    const search = params.search || '';
+    if (search) filtered = filtered.filter(c =>
+      c.name?.includes(search) || c.phone1?.includes(search) || c.type?.includes(search));
+
+    container.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🏢 거래처 관리</span>
+          <span class="badge badge-navy" style="margin-left:8px">${filtered.length}개</span>
+          <div style="margin-left:auto">
+            <button class="btn btn-gold btn-sm" onclick="Pages.openClientModal()">+ 거래처 등록</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding-bottom:0">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" placeholder="업체명, 전화번호, 업종 검색..."
+                value="${search}"
+                oninput="Router.go('clients',{search:this.value,page:1})">
+            </div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead><tr><th>#</th><th>거래처명</th><th>업종</th><th>담당자</th><th>전화번호</th><th>주소</th><th>사업자번호</th><th>상태</th><th>관리</th></tr></thead>
+            <tbody>
+              ${filtered.map((c,i)=>`
+                <tr>
+                  <td style="color:var(--gray-500)">${i+1}</td>
+                  <td><span class="cell-main">${c.name}</span><div class="cell-sub">${c.email||''}</div></td>
+                  <td><span class="badge badge-navy">${c.type||'-'}</span></td>
+                  <td>${c.contact||'-'}</td>
+                  <td class="font-mono">${c.phone1||'-'}</td>
+                  <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${c.addr||'-'}</td>
+                  <td class="font-mono">${c.bizNo||'-'}</td>
+                  <td><span class="badge ${c.status==='거래중'?'badge-green':'badge-gray'}">${c.status||'-'}</span></td>
+                  <td>
+                    <div class="flex gap-8">
+                      <button class="btn btn-outline btn-sm btn-icon" onclick="Pages.openClientModal('${c.id}')" title="수정">✏️</button>
+                      <button class="btn btn-danger btn-sm btn-icon" onclick="Pages.deleteClient('${c.id}')" title="삭제">🗑️</button>
+                    </div>
+                  </td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  },
+
+  // ── 금전출납부 ──
+  ledger(container, params={}) {
+    let filtered = [...App.data.ledger];
+    const search = params.search || '';
+    const month  = params.month || Utils.thisMonth();
+    if (month) filtered = filtered.filter(r => String(r.date||'').startsWith(month));
+    if (search) filtered = filtered.filter(r =>
+      r.worker?.includes(search) || r.client?.includes(search) || r.site?.includes(search));
+
+    const totalPay    = filtered.reduce((s,r) => s+(Number(r.payment)||0), 0);
+    const totalIncome = filtered.reduce((s,r) => s+(Number(r.income)||0), 0);
+    const totalFee    = filtered.reduce((s,r) => s+(Number(r.days||0)*Number(r.dayWage||0)*Number(r.fee||0)), 0);
+
+    container.innerHTML = `
+      <!-- 월 잔액 현황 -->
+      <div class="balance-box mb-24">
+        <div class="balance-item"><div class="b-label">💵 이달 입금(수수료)</div><div class="b-value">${Utils.formatMoney(totalIncome)}</div></div>
+        <div class="balance-divider"></div>
+        <div class="balance-item"><div class="b-label">📤 이달 지불액</div><div class="b-value">${Utils.formatMoney(totalPay)}</div></div>
+        <div class="balance-divider"></div>
+        <div class="balance-item"><div class="b-label">📊 건수</div><div class="b-value">${filtered.length}건</div></div>
+        <div class="balance-divider"></div>
+        <div class="balance-item"><div class="b-label">✅ 순이익</div><div class="b-value" style="color:var(--gold-light)">${Utils.formatMoney(totalIncome)}</div></div>
+        <div style="margin-left:auto">
+          <button class="btn btn-gold" onclick="Pages.openLedgerModal()">+ 출납 입력</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">💰 금전출납부</span>
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+            <input type="month" class="filter-select" value="${month}"
+              onchange="Router.go('ledger',{month:this.value,search:'${search}'})">
+            <button class="btn btn-outline btn-sm" onclick="Pages.printLedger()">🖨️ 인쇄</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding-bottom:0">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" placeholder="근로자, 거래처, 현장 검색..."
+                value="${search}"
+                oninput="Router.go('ledger',{search:this.value,month:'${month}'})">
+            </div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead><tr><th>접수일자</th><th>근로자</th><th>거래처</th><th>작업현장</th><th>직종</th><th>단가</th><th>공수</th><th>수수료율</th><th class="text-right">지불액</th><th>지불메모</th><th class="text-right">입금액</th><th>입금메모</th><th>관리</th></tr></thead>
+            <tbody>
+              ${filtered.map(r=>`
+                <tr>
+                  <td>${Utils.formatDate(r.date)}</td>
+                  <td><span class="cell-main">${r.worker||'-'}</span></td>
+                  <td>${r.client||'-'}</td>
+                  <td>${r.site||'-'}</td>
+                  <td><span class="badge badge-navy">${r.job||'-'}</span></td>
+                  <td class="text-right font-mono">${Utils.formatNum(r.dayWage)}</td>
+                  <td class="text-right">${r.days||'-'}</td>
+                  <td class="text-right">${r.fee?Math.round(r.fee*100)+'%':'-'}</td>
+                  <td class="text-right amount-negative">${Utils.formatMoney(r.payment)}</td>
+                  <td><span style="font-size:11px;color:var(--gray-500)">${r.payMemo||''}</span></td>
+                  <td class="text-right amount-positive">${Utils.formatMoney(r.income)}</td>
+                  <td><span style="font-size:11px;color:var(--gray-500)">${r.incomeMemo||''}</span></td>
+                  <td>
+                    <div class="flex gap-8">
+                      <button class="btn btn-outline btn-sm btn-icon" onclick="Pages.openLedgerModal('${r.id}')" title="수정">✏️</button>
+                      <button class="btn btn-danger btn-sm btn-icon" onclick="Pages.deleteLedger('${r.id}')" title="삭제">🗑️</button>
+                    </div>
+                  </td>
+                </tr>`).join('')}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="8" class="text-right font-bold">합 계</td>
+                <td class="text-right amount-negative">${Utils.formatMoney(totalPay)}</td>
+                <td></td>
+                <td class="text-right amount-positive">${Utils.formatMoney(totalIncome)}</td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    `;
+  },
+
+  // ── 급여 계산기 ──
+  salary(container) {
+    container.innerHTML = `
+      <div class="calc-box mb-24">
+        <div style="font-size:16px;font-weight:800;color:var(--gold-light);margin-bottom:20px">🧮 일용직 급여 계산기 (2026년 기준)</div>
+        <div class="calc-input-row">
+          <div class="calc-field">
+            <label>일 급여 (원)</label>
+            <input type="number" id="calcDayWage" placeholder="예: 130000" oninput="Pages.calcSalary()">
+          </div>
+          <div class="calc-field">
+            <label>근무 일수 (일)</label>
+            <input type="number" id="calcDays" placeholder="예: 20" oninput="Pages.calcSalary()">
+          </div>
+          <div class="calc-field">
+            <label>수수료율 (%)</label>
+            <input type="number" id="calcFeeRate" placeholder="예: 15" value="15" oninput="Pages.calcSalary()">
+          </div>
+        </div>
+        <div class="calc-result" id="calcResult">
+          <div style="text-align:center;color:rgba(255,255,255,0.4);font-size:13px">위 항목을 입력하면 자동으로 계산됩니다</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">📋 세금/보험 요율표 (2026년 기준)</span></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">🗓️ 7일 이하 근무</div>
+              <table class="data-table">
+                <thead><tr><th>항목</th><th>요율</th><th>부담</th></tr></thead>
+                <tbody>
+                  <tr><td>원천세 (소득세)</td><td>6% × 45%</td><td>근로자</td></tr>
+                  <tr><td>지방소득세</td><td>원천세 × 10%</td><td>근로자</td></tr>
+                  <tr><td>고용보험</td><td>0.9%</td><td>근로자</td></tr>
+                  <tr><td>고용보험(사업주)</td><td>1.15%</td><td>회사</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">🗓️ 8일 이상 근무 (추가 공제)</div>
+              <table class="data-table">
+                <thead><tr><th>항목</th><th>요율</th><th>부담</th></tr></thead>
+                <tbody>
+                  <tr><td>원천세+지방소득세+고용보험</td><td>위 동일</td><td>근로자</td></tr>
+                  <tr><td>국민연금</td><td>4.5%</td><td>근로자 반반</td></tr>
+                  <tr><td>건강보험</td><td>3.545%</td><td>근로자 반반</td></tr>
+                  <tr><td>장기요양보험</td><td>건강보험 × 12.95%</td><td>근로자 반반</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px;background:rgba(201,168,76,0.06);border:1.5px solid rgba(201,168,76,0.2)">
+            <div class="card-body" style="padding:14px 16px">
+              <strong style="color:var(--gold-dark)">⚠️ 2025년 1월 1일 부가세법 변경</strong>
+              <p style="font-size:12px;color:var(--gray-700);margin-top:6px;line-height:1.8">
+                인력공급업이 <strong>면세사업자로 전환</strong>되었습니다. 부가세 없는 계산서(면세계산서)를 발행합니다.<br>
+                단, 파견근로자(브릿지웍스)는 적용 제외 → 세금계산서 발행 유지
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  calcSalary() {
+    const w = parseFloat(document.getElementById('calcDayWage').value) || 0;
+    const d = parseInt(document.getElementById('calcDays').value) || 0;
+    const fr = parseFloat(document.getElementById('calcFeeRate').value) || 15;
+    const r = document.getElementById('calcResult');
+    if (!w || !d) { r.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);font-size:13px">위 항목을 입력하면 자동으로 계산됩니다</div>'; return; }
+    const t = Utils.calcTax(w, d);
+    const fee = Math.round(t.total * fr / 100);
+    r.innerHTML = `
+      <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:12px">📋 ${t.type} 적용</div>
+      <div class="calc-row"><span class="r-label">총 급여 (${d}일 × ${Utils.formatNum(w)}원)</span><span class="r-value">${Utils.formatMoney(t.total)}</span></div>
+      <div class="calc-row"><span class="r-label">원천세 (소득세)</span><span class="r-value deduct">-${Utils.formatMoney(t.incomeTax)}</span></div>
+      <div class="calc-row"><span class="r-label">지방소득세</span><span class="r-value deduct">-${Utils.formatMoney(t.localTax)}</span></div>
+      <div class="calc-row"><span class="r-label">고용보험 (0.9%)</span><span class="r-value deduct">-${Utils.formatMoney(t.empIns)}</span></div>
+      ${t.type==='8일이상'?`
+      <div class="calc-row"><span class="r-label">국민연금 (4.5%)</span><span class="r-value deduct">-${Utils.formatMoney(t.pension)}</span></div>
+      <div class="calc-row"><span class="r-label">건강보험 (3.545%)</span><span class="r-value deduct">-${Utils.formatMoney(t.healthIns)}</span></div>
+      <div class="calc-row"><span class="r-label">장기요양보험</span><span class="r-value deduct">-${Utils.formatMoney(t.longCare)}</span></div>
+      `:''}
+      <div class="calc-row total"><span class="r-label">총 공제액</span><span class="r-value deduct">-${Utils.formatMoney(t.totalDeduct)}</span></div>
+      <div class="calc-row"><span class="r-label" style="font-size:15px;font-weight:800">실수령액</span><span class="r-value net">${Utils.formatMoney(t.net)}</span></div>
+      <div class="calc-row" style="border-top:1px solid rgba(201,168,76,0.3);margin-top:8px"><span class="r-label" style="color:var(--gold-light)">수수료 (${fr}%)</span><span class="r-value" style="color:var(--gold-light)">${Utils.formatMoney(fee)}</span></div>
+    `;
+  },
+
+  // ── 서류 출력 ──
+  documents(container) {
+    container.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+        ${[
+          {icon:'📝',title:'근로계약서',desc:'일용직 근로계약서 자동 생성',btn:'작성하기'},
+          {icon:'📋',title:'구직접수대장',desc:'직업소개 법정 서식',btn:'작성하기'},
+          {icon:'📋',title:'구인접수대장',desc:'구인업체 법정 서식',btn:'작성하기'},
+          {icon:'🤝',title:'수수료 대리수령 동의서',desc:'근로자 수수료 대리수령 서식',btn:'작성하기'},
+          {icon:'📊',title:'근로자 회원명부',desc:'직업소개소 필수 비치 서류',btn:'작성하기'},
+          {icon:'🧾',title:'일용 지급조서',desc:'세무 신고용 지급조서',btn:'작성하기'},
+        ].map(d=>`
+          <div class="card">
+            <div class="card-body" style="text-align:center;padding:28px 20px">
+              <div style="font-size:40px;margin-bottom:12px">${d.icon}</div>
+              <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:8px">${d.title}</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-bottom:20px">${d.desc}</div>
+              <button class="btn btn-primary btn-sm" style="width:100%">${d.btn}</button>
+            </div>
+          </div>`).join('')}
+      </div>
+    `;
+  },
+
+  // ── 설정 ──
+  settings(container) {
+    const cfg = Store.load('config', {
+      companyName:'브릿지웍스 주식회사', ceo:'박재관',
+      bizNo:'841-86-03358', licenseNo:'2025-23',
+      addr:'경기도 수원시 권선구 정조로 458, 301호(세류동)',
+      phone:'', email:'', feeRate:15,
+    });
+    container.innerHTML = `
+      <div class="card">
+        <div class="card-header"><span class="card-title">⚙️ 회사 정보 설정</span></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-field"><label class="form-label">회사명 <span class="required">*</span></label>
+              <input class="form-input" id="cfgName" value="${cfg.companyName}"></div>
+            <div class="form-field"><label class="form-label">대표자</label>
+              <input class="form-input" id="cfgCeo" value="${cfg.ceo}"></div>
+            <div class="form-field"><label class="form-label">사업자등록번호</label>
+              <input class="form-input" id="cfgBizNo" value="${cfg.bizNo}"></div>
+            <div class="form-field"><label class="form-label">파견허가번호</label>
+              <input class="form-input" id="cfgLicNo" value="${cfg.licenseNo}"></div>
+            <div class="form-field span-2"><label class="form-label">주소</label>
+              <input class="form-input" id="cfgAddr" value="${cfg.addr}"></div>
+            <div class="form-field"><label class="form-label">전화번호</label>
+              <input class="form-input" id="cfgPhone" value="${cfg.phone||''}"></div>
+            <div class="form-field"><label class="form-label">기본 수수료율 (%)</label>
+              <input class="form-input" id="cfgFee" type="number" value="${cfg.feeRate||15}"></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-gold" onclick="Pages.saveSettings()">💾 저장</button>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  saveSettings() {
+    const cfg = {
+      companyName: document.getElementById('cfgName').value,
+      ceo: document.getElementById('cfgCeo').value,
+      bizNo: document.getElementById('cfgBizNo').value,
+      licenseNo: document.getElementById('cfgLicNo').value,
+      addr: document.getElementById('cfgAddr').value,
+      phone: document.getElementById('cfgPhone').value,
+      feeRate: parseFloat(document.getElementById('cfgFee').value)||15,
+    };
+    Store.save('config', cfg);
+    Toast.show('설정이 저장되었습니다.', 'success');
+  },
+
+  // ── 모달: 노무자 등록/수정 ──
+  openWorkerModal(id=null) {
+    const w = id ? App.data.workers.find(x=>x.id===id) : {};
+    Modal.open('workerModal', `${id?'노무자 수정':'노무자 등록'}`, `
+      <div class="form-grid">
+        <div class="form-field"><label class="form-label">이름 <span class="required">*</span></label>
+          <input class="form-input" id="wName" value="${w?.name||''}"></div>
+        <div class="form-field"><label class="form-label">주민등록번호</label>
+          <input class="form-input" id="wSSN" value="${w?.ssn||''}" placeholder="000000-0000000"></div>
+        <div class="form-field"><label class="form-label">전화번호</label>
+          <input class="form-input" id="wPhone" value="${w?.phone||''}" placeholder="010-0000-0000"></div>
+        <div class="form-field"><label class="form-label">직종</label>
+          <select class="form-select" id="wJob">
+            ${['청소용역','생산직','일반노무','경비','사무보조','건설현장','기타'].map(j=>`<option ${w?.job===j?'selected':''}>${j}</option>`).join('')}
+          </select></div>
+        <div class="form-field span-2"><label class="form-label">주소</label>
+          <input class="form-input" id="wAddr" value="${w?.addr||''}"></div>
+        <div class="form-field"><label class="form-label">신용도</label>
+          <select class="form-select" id="wCredit">
+            ${['C','A','E'].map(c=>`<option ${w?.credit===c?'selected':''}>${c}</option>`).join('')}
+          </select></div>
+        <div class="form-field"><label class="form-label">상태</label>
+          <select class="form-select" id="wStatus">
+            ${['구직중','배치중','비활성'].map(s=>`<option ${w?.status===s?'selected':''}>${s}</option>`).join('')}
+          </select></div>
+        <div class="form-field span-2"><label class="form-label">메모</label>
+          <textarea class="form-textarea" id="wMemo">${w?.memo||''}</textarea></div>
+      </div>
+    `, () => Pages.saveWorker(id));
+  },
+
+  saveWorker(id) {
+    const data = {
+      id: id || 'W'+Utils.genId(),
+      name:   document.getElementById('wName').value.trim(),
+      ssn:    document.getElementById('wSSN').value.trim(),
+      phone:  document.getElementById('wPhone').value.trim(),
+      job:    document.getElementById('wJob').value,
+      addr:   document.getElementById('wAddr').value.trim(),
+      credit: document.getElementById('wCredit').value,
+      status: document.getElementById('wStatus').value,
+      memo:   document.getElementById('wMemo').value.trim(),
+      regDate: id ? (App.data.workers.find(x=>x.id===id)?.regDate||Utils.today()) : Utils.today(),
+    };
+    if (!data.name) { Toast.show('이름을 입력해주세요.','error'); return; }
+    if (id) {
+      const i = App.data.workers.findIndex(x=>x.id===id);
+      App.data.workers[i] = data;
+    } else {
+      App.data.workers.push(data);
+    }
+    Store.save('workers', App.data.workers);
+    Modal.close();
+    Toast.show(id?'노무자 정보가 수정되었습니다.':'노무자가 등록되었습니다.','success');
+    Router.go('workers');
+  },
+
+  deleteWorker(id) {
+    if (!confirm('이 노무자를 삭제하시겠습니까?')) return;
+    App.data.workers = App.data.workers.filter(x=>x.id!==id);
+    Store.save('workers', App.data.workers);
+    Toast.show('삭제되었습니다.','success');
+    Router.go('workers');
+  },
+
+  // ── 모달: 거래처 ──
+  openClientModal(id=null) {
+    const c = id ? App.data.clients.find(x=>x.id===id) : {};
+    Modal.open('clientModal','거래처 '+(id?'수정':'등록'),`
+      <div class="form-grid">
+        <div class="form-field span-2"><label class="form-label">거래처명 <span class="required">*</span></label>
+          <input class="form-input" id="cName" value="${c?.name||''}"></div>
+        <div class="form-field"><label class="form-label">사업자번호</label>
+          <input class="form-input" id="cBizNo" value="${c?.bizNo||''}" placeholder="000-00-00000"></div>
+        <div class="form-field"><label class="form-label">업종</label>
+          <input class="form-input" id="cType" value="${c?.type||''}"></div>
+        <div class="form-field"><label class="form-label">담당자</label>
+          <input class="form-input" id="cContact" value="${c?.contact||''}"></div>
+        <div class="form-field"><label class="form-label">전화번호</label>
+          <input class="form-input" id="cPhone" value="${c?.phone1||''}" placeholder="031-000-0000"></div>
+        <div class="form-field span-2"><label class="form-label">주소</label>
+          <input class="form-input" id="cAddr" value="${c?.addr||''}"></div>
+        <div class="form-field"><label class="form-label">이메일</label>
+          <input class="form-input" id="cEmail" value="${c?.email||''}"></div>
+        <div class="form-field"><label class="form-label">상태</label>
+          <select class="form-select" id="cStatus">
+            ${['거래중','거래종료'].map(s=>`<option ${c?.status===s?'selected':''}>${s}</option>`).join('')}
+          </select></div>
+        <div class="form-field span-2"><label class="form-label">메모</label>
+          <textarea class="form-textarea" id="cMemo">${c?.memo||''}</textarea></div>
+      </div>
+    `, ()=>Pages.saveClient(id));
+  },
+
+  saveClient(id) {
+    const data = {
+      id: id||'C'+Utils.genId(),
+      name: document.getElementById('cName').value.trim(),
+      bizNo: document.getElementById('cBizNo').value.trim(),
+      type: document.getElementById('cType').value.trim(),
+      contact: document.getElementById('cContact').value.trim(),
+      phone1: document.getElementById('cPhone').value.trim(),
+      addr: document.getElementById('cAddr').value.trim(),
+      email: document.getElementById('cEmail').value.trim(),
+      status: document.getElementById('cStatus').value,
+      memo: document.getElementById('cMemo').value.trim(),
+      regDate: id?(App.data.clients.find(x=>x.id===id)?.regDate||Utils.today()):Utils.today(),
+    };
+    if (!data.name) { Toast.show('거래처명을 입력해주세요.','error'); return; }
+    if (id) { const i=App.data.clients.findIndex(x=>x.id===id); App.data.clients[i]=data; }
+    else App.data.clients.push(data);
+    Store.save('clients', App.data.clients);
+    Modal.close(); Toast.show('저장되었습니다.','success'); Router.go('clients');
+  },
+
+  deleteClient(id) {
+    if (!confirm('이 거래처를 삭제하시겠습니까?')) return;
+    App.data.clients = App.data.clients.filter(x=>x.id!==id);
+    Store.save('clients', App.data.clients);
+    Toast.show('삭제되었습니다.','success'); Router.go('clients');
+  },
+
+  // ── 모달: 금전출납 ──
+  openLedgerModal(id=null) {
+    const r = id ? App.data.ledger.find(x=>x.id===id) : {};
+    const workers = App.data.workers.map(w=>`<option ${r?.worker===w.name?'selected':''}>${w.name}</option>`).join('');
+    const clients = App.data.clients.map(c=>`<option ${r?.client===c.name?'selected':''}>${c.name}</option>`).join('');
+    Modal.open('ledgerModal','출납 '+(id?'수정':'입력'),`
+      <div class="form-grid">
+        <div class="form-field"><label class="form-label">접수일자 <span class="required">*</span></label>
+          <input class="form-input" id="lDate" type="date" value="${r?.date||Utils.today()}"></div>
+        <div class="form-field"><label class="form-label">근로자</label>
+          <select class="form-select" id="lWorker"><option value="">선택</option>${workers}</select></div>
+        <div class="form-field"><label class="form-label">거래처</label>
+          <select class="form-select" id="lClient"><option value="">선택</option>${clients}</select></div>
+        <div class="form-field"><label class="form-label">작업현장</label>
+          <input class="form-input" id="lSite" value="${r?.site||''}"></div>
+        <div class="form-field"><label class="form-label">직종</label>
+          <input class="form-input" id="lJob" value="${r?.job||''}"></div>
+        <div class="form-field"><label class="form-label">단가 (일)</label>
+          <input class="form-input" id="lDayWage" type="number" value="${r?.dayWage||''}" oninput="Pages.calcLedger()"></div>
+        <div class="form-field"><label class="form-label">공수 (일)</label>
+          <input class="form-input" id="lDays" type="number" value="${r?.days||''}" oninput="Pages.calcLedger()"></div>
+        <div class="form-field"><label class="form-label">수수료율 (%)</label>
+          <input class="form-input" id="lFeeRate" type="number" value="${r?.fee?r.fee*100:15}" oninput="Pages.calcLedger()"></div>
+        <div class="form-field"><label class="form-label">지불액</label>
+          <input class="form-input" id="lPayment" type="number" value="${r?.payment||''}"></div>
+        <div class="form-field"><label class="form-label">지불메모</label>
+          <input class="form-input" id="lPayMemo" value="${r?.payMemo||'계좌이체'}"></div>
+        <div class="form-field"><label class="form-label">입금액 (수수료)</label>
+          <input class="form-input" id="lIncome" type="number" value="${r?.income||''}"></div>
+        <div class="form-field"><label class="form-label">입금메모</label>
+          <input class="form-input" id="lIncomeMemo" value="${r?.incomeMemo||''}"></div>
+      </div>
+    `, ()=>Pages.saveLedger(id));
+  },
+
+  calcLedger() {
+    const w = parseFloat(document.getElementById('lDayWage').value)||0;
+    const d = parseInt(document.getElementById('lDays').value)||0;
+    const fr= parseFloat(document.getElementById('lFeeRate').value)||15;
+    if (!w||!d) return;
+    const t = Utils.calcTax(w, d);
+    document.getElementById('lPayment').value  = t.net;
+    document.getElementById('lIncome').value   = Math.round(t.total * fr/100);
+    document.getElementById('lIncomeMemo').value = `수수료 ${fr}%`;
+  },
+
+  saveLedger(id) {
+    const data = {
+      id: id||'L'+Utils.genId(),
+      date: document.getElementById('lDate').value,
+      worker: document.getElementById('lWorker').value,
+      client: document.getElementById('lClient').value,
+      site: document.getElementById('lSite').value,
+      job: document.getElementById('lJob').value,
+      dayWage: parseFloat(document.getElementById('lDayWage').value)||0,
+      days: parseInt(document.getElementById('lDays').value)||0,
+      fee: (parseFloat(document.getElementById('lFeeRate').value)||15)/100,
+      payment: parseFloat(document.getElementById('lPayment').value)||0,
+      payMemo: document.getElementById('lPayMemo').value,
+      income: parseFloat(document.getElementById('lIncome').value)||0,
+      incomeMemo: document.getElementById('lIncomeMemo').value,
+      regDate: Utils.today(),
+    };
+    if (!data.date) { Toast.show('날짜를 입력해주세요.','error'); return; }
+    if (id) { const i=App.data.ledger.findIndex(x=>x.id===id); App.data.ledger[i]=data; }
+    else App.data.ledger.push(data);
+    Store.save('ledger', App.data.ledger);
+    Modal.close(); Toast.show('저장되었습니다.','success'); Router.go('ledger');
+  },
+
+  deleteLedger(id) {
+    if (!confirm('이 출납 내역을 삭제하시겠습니까?')) return;
+    App.data.ledger = App.data.ledger.filter(x=>x.id!==id);
+    Store.save('ledger', App.data.ledger);
+    Toast.show('삭제되었습니다.','success'); Router.go('ledger');
+  },
+
+  printLedger() { window.print(); },
+  exportWorkers() { Toast.show('엑셀 내보내기 기능은 준비 중입니다.','info'); },
+  jobseek(c)  { c.innerHTML = '<div class="card card-body"><p style="color:var(--gray-500)">구직대장 기능 구현 중...</p></div>'; },
+  joboffer(c) { c.innerHTML = '<div class="card card-body"><p style="color:var(--gray-500)">구인대장 기능 구현 중...</p></div>'; },
+  tax(c)      { c.innerHTML = '<div class="card card-body"><p style="color:var(--gray-500)">세무자료 기능 구현 중...</p></div>'; },
+};
+
+// ============ 모달 헬퍼 ============
+const Modal = {
+  open(id, title, body, onSave) {
+    let m = document.getElementById('globalModal');
+    m.querySelector('.modal-title').textContent = title;
+    m.querySelector('.modal-body').innerHTML = body;
+    m.querySelector('.btn-modal-save').onclick = onSave;
+    document.getElementById('modalOverlay').classList.add('show');
+  },
+  close() {
+    document.getElementById('modalOverlay').classList.remove('show');
+  },
+};
+
+// ============ 로그인 ============
+function doLogin() {
+  const id = document.getElementById('loginId').value;
+  const pw = document.getElementById('loginPw').value;
+  if (!id||!pw) { Toast.show('아이디와 비밀번호를 입력해주세요.','error'); return; }
+  // 간단 인증 (실제 서버 연동 시 교체)
+  if ((id==='admin'&&pw==='1234')||(id==='박재관'&&pw==='bridgeworks')) {
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('appPage').classList.remove('hidden');
+    App.currentUser = id;
+    document.querySelector('.user-name').textContent = id==='박재관'?'박재관 대표':'관리자';
+    Store.init();
+    Router.go('dashboard');
+    Toast.show(`안녕하세요! ${id==='박재관'?'박재관 대표님':'관리자'}`, 'success');
+  } else {
+    Toast.show('아이디 또는 비밀번호가 올바르지 않습니다.','error');
+  }
+}
+function doLogout() {
+  if (!confirm('로그아웃 하시겠습니까?')) return;
+  document.getElementById('appPage').classList.add('hidden');
+  document.getElementById('loginPage').classList.remove('hidden');
+}
+
+// ============ 초기화 ============
+window.addEventListener('DOMContentLoaded', () => {
+  // Enter 키 로그인
+  document.addEventListener('keydown', e => {
+    if (e.key==='Enter' && !document.getElementById('loginPage').classList.contains('hidden')) doLogin();
+  });
+  // 모달 오버레이 클릭 닫기
+  document.getElementById('modalOverlay')?.addEventListener('click', e => {
+    if (e.target.id==='modalOverlay') Modal.close();
+  });
+});
+
+</script>
+<script>
+/**
+ * 브릿지웍스 알림 시스템 v2.0
+ * ────────────────────────────────────────────
+ *  1) Google Apps Script 웹훅 → 이메일 알림 + 구글 시트 저장
+ *  2) 카카오 SDK "나에게 보내기" → 카카오톡 실시간 알림 (개선된 템플릿)
+ *  3) 파일 첨부 (이력서/신분증) → 구글 드라이브 자동 저장
+ * ────────────────────────────────────────────
+ */
+
+const BW_NOTIFY = (() => {
+
+  /* ─── ① 설정 ────────────────────────────── */
+  const CONFIG = {
+    GAS_WEBHOOK_URL: 'YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL',
+    KAKAO_JS_KEY:    'YOUR_KAKAO_JAVASCRIPT_APP_KEY',
+    ADMIN_EMAIL:     'admin@bridgeworks.co.kr',
+    COMPANY_NAME:    '브릿지웍스 주식회사',
+    MAX_FILE_SIZE_MB: 10,   // 첨부 파일 최대 크기 (MB)
+  };
+
+  /* ─── ② 카카오 SDK 초기화 ────────────────── */
+  function initKakao() {
+    if (!window.Kakao) return;
+    if (!Kakao.isInitialized()) {
+      try { Kakao.init(CONFIG.KAKAO_JS_KEY); } catch(e) {}
+    }
+  }
+
+  /* ─── ③ 개선된 카카오 메시지 템플릿 ──────── */
+  function buildKakaoText(data) {
+    const now = new Date().toLocaleString('ko-KR', {
+      year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', hour12: false
+    });
+
+    const typeEmoji  = data.type === '구인' ? '🏢' : '👤';
+    const typeLabel  = data.type === '구인' ? '구인 신청 (업체)' : '구직 신청 (개인)';
+    const nameLabel  = data.type === '구인' ? '업체명' : '신청자';
+    const fileNote   = data.files && data.files.length > 0
+                       ? `\n📎 첨부파일: ${data.files.map(f=>f.name).join(', ')}`
+                       : '';
+
+    return (
+`━━━━━━━━━━━━━━━━━━━━━━━━
+${typeEmoji} 브릿지웍스 신규 신청 접수!
+━━━━━━━━━━━━━━━━━━━━━━━━
+📋 신청 유형 : ${typeLabel}
+👤 ${nameLabel.padEnd(6)}: ${data.name || '-'}
+📞 연락처   : ${data.phone || '-'}
+💼 업종/직종 : ${data.job || '-'}
+📝 문의내용 :
+${(data.msg || '-').replace(/(.{30})/g, '$1\n')}${fileNote}
+━━━━━━━━━━━━━━━━━━━━━━━━
+⏰ ${now}
+🔗 관리자 페이지에서 확인하세요
+━━━━━━━━━━━━━━━━━━━━━━━━`
+    );
+  }
+
+  /* ─── ④ 카카오 "나에게 보내기" ─────────────*/
+  function sendKakaoMessage(data) {
+    return new Promise((resolve, reject) => {
+      if (!window.Kakao || !Kakao.isInitialized()) { reject('Kakao SDK 미초기화'); return; }
+
+      const token = localStorage.getItem('bw_kakao_token');
+      if (!token) { reject('카카오 로그인 필요'); return; }
+
+      const exp = parseInt(localStorage.getItem('bw_kakao_token_exp') || '0');
+      if (Date.now() > exp) { reject('카카오 토큰 만료 — 재로그인 필요'); return; }
+
+      const msg = {
+        object_type: 'text',
+        text: buildKakaoText(data),
+        link: {
+          mobile_web_url: 'https://bridgeworks.co.kr',
+          web_url:        'https://bridgeworks.co.kr'
+        }
+      };
+
+      fetch('https://kapi.kakao.com/v2/api/talk/memo/default/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type':  'application/x-www-form-urlencoded'
+        },
+        body: 'template_object=' + encodeURIComponent(JSON.stringify(msg))
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.result_code === 0) resolve('카카오톡 발송 성공');
+        else reject('카카오톡 발송 실패: ' + JSON.stringify(res));
+      })
+      .catch(reject);
+    });
+  }
+
+  /* ─── ⑤ 카카오 로그인/로그아웃 ──────────── */
+  function kakaoAdminLogin() {
+    if (!window.Kakao || !Kakao.isInitialized()) {
+      alert('카카오 SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.'); return;
+    }
+    Kakao.Auth.login({
+      scope: 'talk_message',
+      success(authObj) {
+        localStorage.setItem('bw_kakao_token',     authObj.access_token);
+        localStorage.setItem('bw_kakao_token_exp', Date.now() + authObj.expires_in * 1000);
+        showNotifyToast('✅ 카카오 로그인 성공! 신청 알림이 카카오톡으로 전송됩니다.', 'success');
+        updateKakaoStatus();
+      },
+      fail(err) {
+        showNotifyToast('카카오 로그인 실패: ' + JSON.stringify(err), 'error');
+      }
+    });
+  }
+
+  function kakaoAdminLogout() {
+    localStorage.removeItem('bw_kakao_token');
+    localStorage.removeItem('bw_kakao_token_exp');
+    updateKakaoStatus();
+    showNotifyToast('카카오 로그아웃 완료', 'info');
+  }
+
+  function updateKakaoStatus() {
+    ['kakaoLoginStatus', 'kakaoLoginStatus2'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const token = localStorage.getItem('bw_kakao_token');
+      const exp   = parseInt(localStorage.getItem('bw_kakao_token_exp') || '0');
+      const valid  = token && Date.now() < exp;
+      el.innerHTML = valid
+        ? `<span class="kls-on">🟢 카카오 알림 활성</span>
+           <button class="btn btn-sm btn-outline" onclick="BW_NOTIFY.kakaoAdminLogout()" style="margin-top:6px;font-size:11px">로그아웃</button>`
+        : `<span class="kls-off">🔴 카카오 알림 비활성</span>
+           <button class="btn btn-sm btn-gold" onclick="BW_NOTIFY.kakaoAdminLogin()" style="margin-top:6px;font-size:11px">카카오 로그인</button>`;
+    });
+  }
+
+  /* ─── ⑥ 파일을 Base64로 변환 ─────────────── */
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /* ─── ⑦ GAS 웹훅 (파일 포함) ────────────── */
+  async function sendGASWebhook(data, files) {
+    if (!CONFIG.GAS_WEBHOOK_URL || CONFIG.GAS_WEBHOOK_URL.startsWith('YOUR_')) return 'GAS 미설정';
+
+    const payload = {
+      ...data,
+      company: CONFIG.COMPANY_NAME,
+      ts: new Date().toISOString(),
+      files: []
+    };
+
+    // 파일 Base64 인코딩
+    if (files && files.length > 0) {
+      for (const f of files) {
+        if (f.size > CONFIG.MAX_FILE_SIZE_MB * 1024 * 1024) {
+          console.warn(`파일 크기 초과: ${f.name} (${(f.size/1024/1024).toFixed(1)}MB)`);
+          continue;
+        }
+        try {
+          const b64 = await fileToBase64(f);
+          payload.files.push({ name: f.name, type: f.type, data: b64 });
+        } catch(e) { console.error(e); }
+      }
+    }
+
+    const res = await fetch(CONFIG.GAS_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return res.text();
+  }
+
+  /* ─── ⑧ 통합 발송 ──────────────────────── */
+  async function send(data, files) {
+    const results = { gas: null, kakao: null };
+    try { results.gas   = await sendGASWebhook(data, files); } catch(e) { results.gas   = 'error: ' + e; }
+    try { results.kakao = await sendKakaoMessage(data);       } catch(e) { results.kakao = String(e);     }
+    console.log('[BW_NOTIFY v2]', results);
+    return results;
+  }
+
+  /* ─── ⑨ 토스트 ─────────────────────────── */
+  function showNotifyToast(msg, type='info') {
+    if (typeof Toast !== 'undefined') { Toast.show(msg, type, 4000); return; }
+    console.log('[Toast]', msg);
+  }
+
+  return { send, initKakao, kakaoAdminLogin, kakaoAdminLogout, updateKakaoStatus, CONFIG };
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+  BW_NOTIFY.initKakao();
+  BW_NOTIFY.updateKakaoStatus();
+});
+
+</script>
+<script>
+// 페이지 로드 시 카운터 자동 실행
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    if(typeof startCountUpAll === 'function') startCountUpAll();
+  }, 500);
+  if(typeof BW_NOTIFY !== 'undefined') {
+    BW_NOTIFY.initKakao();
+  }
+  if(typeof syncKakaoStatus === 'function') syncKakaoStatus();
+});
+</script>
+</body>
+</html>
