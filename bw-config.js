@@ -27,8 +27,8 @@ window.BW_CONFIG = {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // ★ 여기 3줄만 실제 값으로 교체하세요
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  KAKAO_JS_KEY:      '63edb182ab01170c102c663749231293',   // ← 교체 필요
-  GAS_WEBHOOK_URL:   'https://script.google.com/macros/s/AKfycbw0gEMXe85X7UkdUo62BHxJImr5wQ6ys_kyIiIrr3DWhmUTt4jRFI7O259HzzgHUJcv/exec', // ← 교체 필요
+  KAKAO_JS_KEY:      '63edb182ab01170c102c663749231293',   // ✅ JS 키 입력됨
+  GAS_WEBHOOK_URL:   'https://script.google.com/macros/s/AKfycbw0gEMXe85X7UkdUo62BHxJImr5wQ6ys_kyIiIrr3DWhmUTt4jRFI7O259HzzgHUJcv/exec',  // ✅ GAS URL 적용됨
   ADMIN_PASSWORD:    'Qkrworhks1@#',                 // ← 관리자 비밀번호
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -38,7 +38,7 @@ window.BW_CONFIG = {
   ADMIN_EMAIL:       'admin@bridgeworks.co.kr',
   MAX_FILE_SIZE_MB:  10,
   ALLOWED_EXTS:      ['pdf','jpg','jpeg','png','hwp','doc','docx'],
-  KAKAO_CHANNEL_ID:  '_YOUR_CHANNEL',    // 카카오 채널 ID (pf.kakao.com/_ID)
+  KAKAO_CHANNEL_ID:  '_bridgeworks',     // ✅ 카카오 채널 ID
   STORE_KEY:         'bw_applications_v2',
 
   // 테스트 모드 (true = GAS 실제 전송 안 함, 콘솔 로그만)
