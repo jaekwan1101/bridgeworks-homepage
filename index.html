@@ -11,7 +11,7 @@
 <script src="bw-config.js" onerror="console.warn('bw-config.js 없음')"></script>
   <!-- 카카오 맵 JS API -->
   <script type="text/javascript"
-    src="//dapi.kakao.com/v2/maps/sdk.js?appkey=63edb182ab01170c102c663749231293&libraries=services"></script>
+    src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_MAP_APP_KEY&libraries=services"></script>
   
 </head>
 <style>
@@ -3287,7 +3287,7 @@ ${(data.msg || '-').replace(/(.{30})/g, '$1\n')}${fileNote}
       alert('카카오 SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.'); return;
     }
     Kakao.Auth.login({
-      scope: 'talk_message',
+      scope: 'profile',
       success(authObj) {
         localStorage.setItem('bw_kakao_token',     authObj.access_token);
         localStorage.setItem('bw_kakao_token_exp', Date.now() + authObj.expires_in * 1000);
