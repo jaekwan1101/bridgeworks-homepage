@@ -11,7 +11,7 @@
 <script src="bw-config.js" onerror="console.warn('bw-config.js 없음')"></script>
   <!-- 카카오 맵 JS API -->
   <script type="text/javascript"
-    src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_MAP_APP_KEY&libraries=services"></script>
+    src="//dapi.kakao.com/v2/maps/sdk.js?appkey=63edb182ab01170c102c663749231293&libraries=services"></script>
   
 </head>
 <style>
@@ -1897,7 +1897,7 @@ input, select, textarea, button {
       <div class="kt-arrow"></div>
       <div class="kt-title">💬 카카오 채널 상담</div>
       <div class="kt-desc">평일 09:00 ~ 18:00<br>긴급 문의는 24시간 가능</div>
-      <a class="kt-btn" href="https://pf.kakao.com/_YOUR_CHANNEL" target="_blank" onclick="closeKakaoMenu()">채널 바로가기 →</a>
+      <a class="kt-btn" href="https://pf.kakao.com/_bridgeworks" target="_blank" onclick="closeKakaoMenu()">채널 바로가기 →</a>
       <a class="kt-btn kt-btn-outline" href="#contact" onclick="navScroll(event,'contact');closeKakaoMenu()">구인/구직 신청</a>
     </div>
   </div>
@@ -3198,8 +3198,8 @@ const BW_NOTIFY = (() => {
   /* ─── ① 설정 ────────────────────────────── */
   // bw-config.js 우선, 없으면 기본값 사용
   const CONFIG = Object.assign({
-    GAS_WEBHOOK_URL:  'YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL',
-    KAKAO_JS_KEY:     'YOUR_KAKAO_JAVASCRIPT_APP_KEY',
+    GAS_WEBHOOK_URL:  'https://script.google.com/macros/s/AKfycbw0gEMXe85X7UkdUo62BHxJImr5wQ6ys_kyIiIrr3DWhmUTt4jRFI7O259HzzgHUJcv/exec',
+    KAKAO_JS_KEY:     '63edb182ab01170c102c663749231293',
     ADMIN_EMAIL:      'admin@bridgeworks.co.kr',
     COMPANY_NAME:     '브릿지웍스 주식회사',
     MAX_FILE_SIZE_MB: 10,
@@ -3286,18 +3286,26 @@ ${(data.msg || '-').replace(/(.{30})/g, '$1\n')}${fileNote}
     if (!window.Kakao || !Kakao.isInitialized()) {
       alert('카카오 SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.'); return;
     }
-    Kakao.Auth.login({
-      scope: 'profile',
-      success(authObj) {
-        localStorage.setItem('bw_kakao_token',     authObj.access_token);
-        localStorage.setItem('bw_kakao_token_exp', Date.now() + authObj.expires_in * 1000);
-        showNotifyToast('✅ 카카오 로그인 성공! 신청 알림이 카카오톡으로 전송됩니다.', 'success');
-        updateKakaoStatus();
-      },
-      fail(err) {
-        showNotifyToast('카카오 로그인 실패: ' + JSON.stringify(err), 'error');
-      }
-    });
+    // 모바일 팝업 차단 방지: authorize(리다이렉트) 방식 사용
+    // 단, window.opener가 없는 환경(팝업 불가)에서도 동작
+    try {
+      Kakao.Auth.login({
+        scope: 'profile_nickname profile_image',
+        throughTalk: false,
+        success(authObj) {
+          localStorage.setItem('bw_kakao_token',     authObj.access_token);
+          localStorage.setItem('bw_kakao_token_exp', Date.now() + authObj.expires_in * 1000);
+          showNotifyToast('✅ 카카오 로그인 성공! 신청 알림이 카카오톡으로 전송됩니다.', 'success');
+          updateKakaoStatus();
+        },
+        fail(err) {
+          console.error('Kakao login fail:', err);
+          showNotifyToast('카카오 로그인 실패: ' + JSON.stringify(err), 'error');
+        }
+      });
+    } catch(e) {
+      showNotifyToast('카카오 SDK 오류: ' + e.message, 'error');
+    }
   }
 
   function kakaoAdminLogout() {
@@ -3359,7 +3367,9 @@ ${(data.msg || '-').replace(/(.{30})/g, '$1\n')}${fileNote}
 
     const res = await fetch(CONFIG.GAS_WEBHOOK_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      redirect: 'follow',
+      credentials: 'omit',
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(payload)
     });
     return res.text();
